@@ -22,7 +22,8 @@ import tensorflow as tf
 import tensorflow.contrib as tc
 
 
-def rnn(rnn_type, inputs, length, hidden_size, layer_num=1, dropout_keep_prob=None, concat=True):
+def rnn(rnn_type, inputs, length, hidden_size, layer_num=1,
+        dropout_keep_prob=None, concat=True):
     """
     Implements (Bi-)LSTM, (Bi-)GRU and (Bi-)RNN
     Args:

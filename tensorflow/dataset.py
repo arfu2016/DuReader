@@ -16,6 +16,7 @@
 # ==============================================================================
 """
 This module implements data process strategies.
+机器学习数据导入的经典代码
 """
 
 import os
@@ -31,6 +32,7 @@ class BRCDataset(object):
     """
     def __init__(self, max_p_num, max_p_len, max_q_len,
                  train_files=[], dev_files=[], test_files=[]):
+        # p: paragraph? q: question?
         self.logger = logging.getLogger("brc")
         self.max_p_num = max_p_num
         self.max_p_len = max_p_len
@@ -40,6 +42,7 @@ class BRCDataset(object):
         if train_files:
             for train_file in train_files:
                 self.train_set += self._load_dataset(train_file, train=True)
+                # 准备训练数据：train_set中放的是读入的数据
             self.logger.info('Train set size: {} questions.'.format(len(self.train_set)))
 
         if dev_files:
@@ -62,25 +65,46 @@ class BRCDataset(object):
             data_set = []
             for lidx, line in enumerate(fin):
                 sample = json.loads(line.strip())
+                # 把json格式转换成python格式
                 if train:
                     if len(sample['answer_spans']) == 0:
                         continue
                     if sample['answer_spans'][0][1] >= self.max_p_len:
                         continue
+                    # 对容错的考虑
+                    # 如果没有'answer_spans'，该行数据就被舍弃了，
+                    # 不放在training data中
 
                 if 'answer_docs' in sample:
                     sample['answer_passages'] = sample['answer_docs']
+                    # 重新命名
 
                 sample['question_tokens'] = sample['segmented_question']
+                # 重新命名
 
                 sample['passages'] = []
                 for d_idx, doc in enumerate(sample['documents']):
+                    # 每一篇document都做这样的处理
                     if train:
                         most_related_para = doc['most_related_para']
+                        # 文章中最相关的段落
+                        # The most related paragraphs are selected according to
+                        # highest recall of the answer tokens of each document,
+                        # and the index of the selected paragraph of each
+                        # document is stored in "most_related_para".
+                        # 如果没有'most_related_para'这一项如何处理，
+                        # 也应该有所设计： 从most_related_para的获取过程看，
+                        # 有answer必有'most_related_para'
+                        # 若没有answer, 就没有'answer_spans'，
+                        # 在前面已经处理过了，continue
                         sample['passages'].append(
-                            {'passage_tokens': doc['segmented_paragraphs'][most_related_para],
+                            {'passage_tokens':
+                                 doc['segmented_paragraphs'][most_related_para],
+                             # 只保留最相关段落的token
                              'is_selected': doc['is_selected']}
+                            # 记录该篇文章是否被问题回答者参考
                         )
+                        # 只保留了最相关的段落
                     else:
                         para_infos = []
                         for para_tokens in doc['segmented_paragraphs']:
@@ -96,8 +120,10 @@ class BRCDataset(object):
                         fake_passage_tokens = []
                         for para_info in para_infos[:1]:
                             fake_passage_tokens += para_info[0]
-                        sample['passages'].append({'passage_tokens': fake_passage_tokens})
+                        sample['passages'].append({'passage_tokens':
+                                                       fake_passage_tokens})
                 data_set.append(sample)
+                # 把该行数据加入到data_set中
         return data_set
 
     def _one_mini_batch(self, data, indices, pad_id):
@@ -158,6 +184,7 @@ class BRCDataset(object):
 
     def word_iter(self, set_name=None):
         """
+        Actually a generator with yield statement
         Iterates over all the words in the dataset
         Args:
             set_name: if it is set, then the specific set will be used
@@ -176,10 +203,13 @@ class BRCDataset(object):
             raise NotImplementedError('No data set named as {}'.format(set_name))
         if data_set is not None:
             for sample in data_set:
+                # 每个sample代表原数据文件中的一行
                 for token in sample['question_tokens']:
                     yield token
                 for passage in sample['passages']:
+                    # sample中的每一个文档都做处理
                     for token in passage['passage_tokens']:
+                        # tokens in the most related paragraph
                         yield token
 
     def convert_to_ids(self, vocab):
@@ -191,10 +221,14 @@ class BRCDataset(object):
         for data_set in [self.train_set, self.dev_set, self.test_set]:
             if data_set is None:
                 continue
+                # for training data, dev_set and test_set is None
             for sample in data_set:
-                sample['question_token_ids'] = vocab.convert_to_ids(sample['question_tokens'])
+                sample['question_token_ids'] = \
+                    vocab.convert_to_ids(sample['question_tokens'])
+                # convert tokens to ids
                 for passage in sample['passages']:
-                    passage['passage_token_ids'] = vocab.convert_to_ids(passage['passage_tokens'])
+                    passage['passage_token_ids'] = \
+                        vocab.convert_to_ids(passage['passage_tokens'])
 
     def gen_mini_batches(self, set_name, batch_size, pad_id, shuffle=True):
         """

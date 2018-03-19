@@ -29,6 +29,7 @@ import numpy as np
 import tensorflow as tf
 from utils import compute_bleu_rouge
 from utils import normalize
+
 from layers.basic_rnn import rnn
 from layers.match_layer import MatchLSTMLayer
 from layers.match_layer import AttentionFlowMatchLayer
@@ -58,9 +59,11 @@ class RCModel(object):
         self.max_p_len = args.max_p_len
         self.max_q_len = args.max_q_len
         self.max_a_len = args.max_a_len
+        # answer length
 
         # the vocab
         self.vocab = vocab
+        # 使用了组合
 
         # session info
         sess_config = tf.ConfigProto()
@@ -90,49 +93,63 @@ class RCModel(object):
         self._create_train_op()
         self.logger.info('Time to build graph: {} s'.format(time.time() - start_t))
         param_num = sum([np.prod(self.sess.run(tf.shape(v))) for v in self.all_params])
+        # parameter number of the model
         self.logger.info('There are {} parameters in the model'.format(param_num))
 
     def _setup_placeholders(self):
         """
-        Placeholders
+        Placeholders, the variables that are not trainable
+        一个变量，但不是在训练中会改变的那种
         """
         self.p = tf.placeholder(tf.int32, [None, None])
+        # 表示是二维数据，但具体维数可以不在这里给出，具体给数据时才确定
         self.q = tf.placeholder(tf.int32, [None, None])
         self.p_length = tf.placeholder(tf.int32, [None])
+        # 一维数据
         self.q_length = tf.placeholder(tf.int32, [None])
         self.start_label = tf.placeholder(tf.int32, [None])
         self.end_label = tf.placeholder(tf.int32, [None])
         self.dropout_keep_prob = tf.placeholder(tf.float32)
+        # 零维数据，也就是标量数据
 
     def _embed(self):
         """
         The embedding layer, question and passage share embeddings
+        只要词是一样的，embedding就是一样的
         """
         with tf.device('/cpu:0'), tf.variable_scope('word_embedding'):
             self.word_embeddings = tf.get_variable(
                 'word_embeddings',
                 shape=(self.vocab.size(), self.vocab.embed_dim),
                 initializer=tf.constant_initializer(self.vocab.embeddings),
+                # 把已经初始化好的embedding传过来
                 trainable=True
             )
             self.p_emb = tf.nn.embedding_lookup(self.word_embeddings, self.p)
+            # paragraph
             self.q_emb = tf.nn.embedding_lookup(self.word_embeddings, self.q)
+            # question
 
     def _encode(self):
         """
         Employs two Bi-LSTMs to encode passage and question separately
         """
         with tf.variable_scope('passage_encoding'):
-            self.sep_p_encodes, _ = rnn('bi-lstm', self.p_emb, self.p_length, self.hidden_size)
+            self.sep_p_encodes, _ = rnn('bi-lstm', self.p_emb, self.p_length,
+                                        self.hidden_size)
         with tf.variable_scope('question_encoding'):
-            self.sep_q_encodes, _ = rnn('bi-lstm', self.q_emb, self.q_length, self.hidden_size)
+            self.sep_q_encodes, _ = rnn('bi-lstm', self.q_emb, self.q_length,
+                                        self.hidden_size)
         if self.use_dropout:
-            self.sep_p_encodes = tf.nn.dropout(self.sep_p_encodes, self.dropout_keep_prob)
-            self.sep_q_encodes = tf.nn.dropout(self.sep_q_encodes, self.dropout_keep_prob)
+            self.sep_p_encodes = tf.nn.dropout(self.sep_p_encodes,
+                                               self.dropout_keep_prob)
+            self.sep_q_encodes = tf.nn.dropout(self.sep_q_encodes,
+                                               self.dropout_keep_prob)
 
     def _match(self):
         """
         The core of RC model, get the question-aware passage encoding with either BIDAF or MLSTM
+        The attention process
         """
         if self.algo == 'MLSTM':
             match_layer = MatchLSTMLayer(self.hidden_size)
@@ -148,6 +165,7 @@ class RCModel(object):
     def _fuse(self):
         """
         Employs Bi-LSTM again to fuse the context information after match layer
+        得到新的rnn
         """
         with tf.variable_scope('fusion'):
             self.fuse_p_encodes, _ = rnn('bi-lstm', self.match_p_encodes, self.p_length,
@@ -168,10 +186,12 @@ class RCModel(object):
                 self.fuse_p_encodes,
                 [batch_size, -1, 2 * self.hidden_size]
             )
+            # 文章信息
             no_dup_question_encodes = tf.reshape(
                 self.sep_q_encodes,
                 [batch_size, -1, tf.shape(self.sep_q_encodes)[1], 2 * self.hidden_size]
             )[0:, 0, 0:, 0:]
+            # 问题信息
         decoder = PointerNetDecoder(self.hidden_size)
         self.start_probs, self.end_probs = decoder.decode(concat_passage_encodes,
                                                           no_dup_question_encodes)
