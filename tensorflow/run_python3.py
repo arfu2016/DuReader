@@ -177,6 +177,57 @@ def train(args):
     logger.info('Done with model training!')
 
 
+def evaluate(args):
+    """
+    evaluate the trained model on dev files
+    在改变超参数时可以参考
+    """
+    logger = logging.getLogger("brc")
+    logger.info('Load data_set and vocab...')
+    with open(os.path.join(args.vocab_dir, 'vocab.data'), 'rb') as fin:
+        vocab = pickle.load(fin)
+    assert len(args.dev_files) > 0, 'No dev files are provided.'
+    brc_data = BRCDataset(args.max_p_num, args.max_p_len, args.max_q_len,
+                          dev_files=args.dev_files)
+    logger.info('Converting text into ids...')
+    brc_data.convert_to_ids(vocab)
+    logger.info('Restoring the model...')
+    rc_model = RCModel(vocab, args)
+    rc_model.restore(model_dir=args.model_dir, model_prefix=args.algo)
+    logger.info('Evaluating the model on dev set...')
+    dev_batches = brc_data.gen_mini_batches('dev', args.batch_size,
+                                            pad_id=vocab.get_id(vocab.pad_token), shuffle=False)
+    dev_loss, dev_bleu_rouge = rc_model.evaluate(
+        dev_batches, result_dir=args.result_dir, result_prefix='dev.predicted')
+    logger.info('Loss on dev set: {}'.format(dev_loss))
+    logger.info('Result on dev set: {}'.format(dev_bleu_rouge))
+    logger.info('Predicted answers are saved to {}'.format(os.path.join(args.result_dir)))
+
+
+def predict(args):
+    """
+    predicts answers for test files
+    """
+    logger = logging.getLogger("brc")
+    logger.info('Load data_set and vocab...')
+    with open(os.path.join(args.vocab_dir, 'vocab.data'), 'rb') as fin:
+        vocab = pickle.load(fin)
+    assert len(args.test_files) > 0, 'No test files are provided.'
+    brc_data = BRCDataset(args.max_p_num, args.max_p_len, args.max_q_len,
+                          test_files=args.test_files)
+    logger.info('Converting text into ids...')
+    brc_data.convert_to_ids(vocab)
+    logger.info('Restoring the model...')
+    rc_model = RCModel(vocab, args)
+    rc_model.restore(model_dir=args.model_dir, model_prefix=args.algo)
+    logger.info('Predicting answers for test set...')
+    test_batches = brc_data.gen_mini_batches('test', args.batch_size,
+                                             pad_id=vocab.get_id(vocab.pad_token), shuffle=False)
+    rc_model.evaluate(test_batches,
+                      result_dir=args.result_dir,
+                      result_prefix='test.predicted')
+
+
 def run():
     """
     Prepares and runs the whole system.

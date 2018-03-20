@@ -19,6 +19,7 @@ This module implements the reading comprehension models based on:
 1. the BiDAF algorithm described in https://arxiv.org/abs/1611.01603
 2. the Match-LSTM algorithm described in https://openreview.net/pdf?id=B1-q5Pqxl
 Note that we use Pointer Network for the decoding stage of both models.
+机器学习模型组织的经典代码
 """
 
 import os
@@ -210,8 +211,10 @@ class RCModel(object):
                 losses = - tf.reduce_sum(labels * tf.log(probs + epsilon), 1)
             return losses
 
-        self.start_loss = sparse_nll_loss(probs=self.start_probs, labels=self.start_label)
-        self.end_loss = sparse_nll_loss(probs=self.end_probs, labels=self.end_label)
+        self.start_loss = sparse_nll_loss(probs=self.start_probs,
+                                          labels=self.start_label)
+        self.end_loss = sparse_nll_loss(probs=self.end_probs,
+                                        labels=self.end_label)
         self.all_params = tf.trainable_variables()
         self.loss = tf.reduce_mean(tf.add(self.start_loss, self.end_loss))
         if self.weight_decay > 0:
