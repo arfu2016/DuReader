@@ -200,6 +200,10 @@ class RCModel(object):
     def _compute_loss(self):
         """
         The loss function
+        此处损失函数用的还是cross entropy，既考虑start loss，也考虑end loss，把
+        二者结合起来。在做拟合和推测时，都用到start prob和end prob，但处理方法是不同的
+        还有一种处理方法，更类似加强学习，就是拟合的结果不和answer相比，而是把目标
+        函数变成start_prob*end_prob的最大化
         """
 
         def sparse_nll_loss(probs, labels, epsilon=1e-9, scope=None):
@@ -332,6 +336,7 @@ class RCModel(object):
             for sample, start_prob, end_prob in zip(batch['raw_data'], start_probs, end_probs):
 
                 best_answer = self.find_best_answer(sample, start_prob, end_prob, padded_p_len)
+                # 在做evaluate和test的推测工作时，要这样利用start_prob和end_prob
                 if save_full_info:
                     sample['pred_answers'] = [best_answer]
                     pred_answers.append(sample)
@@ -399,6 +404,7 @@ class RCModel(object):
     def find_best_answer_for_passage(self, start_probs, end_probs, passage_len=None):
         """
         Finds the best answer with the maximum start_prob * end_prob from a single passage
+        passage_len是start和end之间最长的长度？
         """
         if passage_len is None:
             passage_len = len(start_probs)
