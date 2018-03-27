@@ -27,8 +27,9 @@ import os
 
 from collections import Counter
 
-file_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(file_dir)
+utils_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(utils_dir)
+print(sys.path)
 
 from bleu_metric.bleu import Bleu
 from rouge_metric.rouge import Rouge
