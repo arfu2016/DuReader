@@ -12,15 +12,14 @@ import logging
 import pickle
 import sys
 from importlib import reload
-reload(sys)
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-file_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append('file_dir')
-
 from dataset import BRCDataset
 from vocab import Vocab
 from rc_model import RCModel
+
+reload(sys)
+# 第二次或者多次导入sys的时候，这里强制要求导入更新后的sys模块，也就是再导入一次，sys模块中
+# 的变量有可能发生变化，比如rc_model.py中就修改了sys.path
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def parse_args():

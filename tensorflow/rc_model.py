@@ -28,13 +28,20 @@ import logging
 import json
 import numpy as np
 import tensorflow as tf
-from utils import compute_bleu_rouge
-from utils import normalize
+import sys
 
 from layers.basic_rnn import rnn
 from layers.match_layer import MatchLSTMLayer
 from layers.match_layer import AttentionFlowMatchLayer
 from layers.pointer_net import PointerNetDecoder
+
+file_dir = os.path.dirname(os.path.abspath(__file__))
+utils_dir = os.path.dirname(file_dir)
+sys.path.append(utils_dir)
+# we need a base_dir
+
+from utils import compute_bleu_rouge
+from utils import normalize
 
 
 class RCModel(object):
