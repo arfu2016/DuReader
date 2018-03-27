@@ -24,15 +24,16 @@ import json
 import sys
 import zipfile
 import os
+import pprint
 
 from collections import Counter
 
-utils_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(utils_dir)
-print(sys.path)
+# utils_dir = os.path.dirname(os.path.abspath(__file__))
+# sys.path.append(utils_dir)
+# pprint.pprint(sys.path)
 
-from bleu_metric.bleu import Bleu
-from rouge_metric.rouge import Rouge
+from .bleu_metric.bleu import Bleu
+from .rouge_metric.rouge import Rouge
 
 EMPTY = ''
 YESNO_LABELS = set(['Yes', 'No', 'Depends'])
