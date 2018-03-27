@@ -30,9 +30,15 @@ from collections import Counter
 
 # utils_dir = os.path.dirname(os.path.abspath(__file__))
 # sys.path.append(utils_dir)
+
+# bleu_dir = os.path.join(utils_dir, 'bleu_metric/')
+# sys.path.append(utils_dir + '/bleu_metric')
 # pprint.pprint(sys.path)
 
 from .bleu_metric.bleu import Bleu
+# from bleu import Bleu
+# from .bleu_metric import Bleu
+
 from .rouge_metric.rouge import Rouge
 
 EMPTY = ''
