@@ -23,10 +23,15 @@ import argparse
 import json
 import sys
 import zipfile
+import os
 
 from collections import Counter
-from .bleu_metric.bleu import Bleu
-from .rouge_metric.rouge import Rouge
+
+file_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(file_dir)
+
+from bleu_metric.bleu import Bleu
+from rouge_metric.rouge import Rouge
 
 EMPTY = ''
 YESNO_LABELS = set(['Yes', 'No', 'Depends'])
