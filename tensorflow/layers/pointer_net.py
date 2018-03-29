@@ -176,4 +176,5 @@ class PointerNetDecoder(object):
                   start_prob)
             print('end_prob in pointer_net.py in layers in tensorflow:',
                   end_prob)
+            print('Compare start_prob == end_prob:', start_prob == end_prob)
             return start_prob, end_prob
