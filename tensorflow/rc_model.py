@@ -292,8 +292,11 @@ class RCModel(object):
         pad_id = self.vocab.get_id(self.vocab.pad_token)
         max_bleu_4 = 0
         for epoch in range(1, epochs + 1):
+            print('1 in rc_model.py')
             self.logger.info('Training the model for epoch {}'.format(epoch))
-            train_batches = data.gen_mini_batches('train', batch_size, pad_id, shuffle=True)
+            train_batches = data.gen_mini_batches('train', batch_size, pad_id,
+                                                  shuffle=True)
+            print('2 in rc_model.py')
             train_loss = self._train_epoch(train_batches, dropout_keep_prob)
             self.logger.info('Average train loss for epoch {} is {}'.format(epoch, train_loss))
 
