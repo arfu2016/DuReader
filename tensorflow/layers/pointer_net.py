@@ -221,8 +221,13 @@ class PointerNetDecoder(object):
 
             with tf.variable_scope('fw2', reuse=True):
                 fw_cell1 = PointerNetLSTMCell(self.hidden_size, passage_vectors)
+                # reuse PointerNetLSTMCell中的权重，作为新的初始化的权重
                 fw_outputs2, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
                                                     sequence_len, init_state)
+                # custom_dynamic_rnn的实现中也引入了随机性，而且这种随机性和第一个参数
+                # fw_cell相关，所以，当第一个参数fw_cell变掉之后，custom_dynamic_rnn
+                # 是没法reuse fw2中的weights的（？），只有当fw_cell依然是之前的fw_cell
+                # 时，custom_dynamic_rnn的weights才能reuse
 
             with tf.variable_scope('bw2'):
                 bw_cell = PointerNetLSTMCell(self.hidden_size, passage_vectors)
