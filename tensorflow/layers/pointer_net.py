@@ -191,7 +191,7 @@ class PointerNetDecoder(object):
         Returns:
             the probs of evary position to be start and end of the answer
         """
-        with tf.variable_scope('pn_decoder'):
+        with tf.variable_scope('pn_decoder2'):
             fake_inputs = tf.zeros([tf.shape(passage_vectors)[0], 2, 1])  # not used
             sequence_len = tf.tile([2], [tf.shape(passage_vectors)[0]])
             if init_with_question:
@@ -204,7 +204,7 @@ class PointerNetDecoder(object):
                 init_state = tc.rnn.LSTMStateTuple(pooled_question_rep, pooled_question_rep)
             else:
                 init_state = None
-            with tf.variable_scope('fw'):
+            with tf.variable_scope('fw2'):
                 fw_cell = PointerNetLSTMCell(self.hidden_size, passage_vectors)
                 fw_outputs, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
                                                    sequence_len, init_state)
@@ -212,7 +212,7 @@ class PointerNetDecoder(object):
                 fw_outputs2, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
                                                    sequence_len, init_state)
 
-            with tf.variable_scope('bw'):
+            with tf.variable_scope('bw2'):
                 bw_cell = PointerNetLSTMCell(self.hidden_size, passage_vectors)
                 bw_outputs, _ = custom_dynamic_rnn(bw_cell, fake_inputs,
                                                    sequence_len, init_state)
