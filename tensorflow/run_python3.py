@@ -20,9 +20,9 @@ reload(sys)
 # 第二次或者多次导入sys的时候，这里强制要求导入更新后的sys模块，也就是再导入一次，sys模块中
 # 的变量有可能发生变化，比如rc_model.py中就修改了sys.path
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-# 3的意思是日志不输出任何错误？，应该设置成2，只输出warning级别以上的信息，如果要输出全部信息，就设成1
-# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
+# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+# "TF_CPP_MIN_LOG_LEVEL"是控制tensorflow的环境变量，0输出所有信息？还是1？
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 
 
 # python run_python3.py --train --algo MLSTM --epochs 1 --batch_size 16

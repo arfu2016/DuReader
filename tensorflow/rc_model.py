@@ -287,7 +287,8 @@ class RCModel(object):
             save_dir: the directory to save the model
             save_prefix: the prefix indicating the model type
             dropout_keep_prob: float value indicating dropout keep probability
-            evaluate: whether to evaluate the model on test set after each epoch
+            evaluate: whether to evaluate the model on test set after each
+              epoch
         """
         pad_id = self.vocab.get_id(self.vocab.pad_token)
         max_bleu_4 = 0
@@ -299,6 +300,7 @@ class RCModel(object):
             print('2 in rc_model.py')
             train_loss = self._train_epoch(train_batches, dropout_keep_prob)
             self.logger.info('Average train loss for epoch {} is {}'.format(epoch, train_loss))
+            print('3 in rc_model.py')
 
             if evaluate:
                 self.logger.info('Evaluating the model after epoch {}'.format(epoch))
