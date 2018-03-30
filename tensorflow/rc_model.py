@@ -272,11 +272,23 @@ class RCModel(object):
                          self.start_label: batch['start_id'],
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
+            print('feed_dict in rc_model.py:', feed_dict)
             print('2.1 in _train_epoch in rc_model.py')
-            print(self.start_probs, self.end_probs)
+            print('shape of self.start_probs:',
+                  self.start_probs.get_shape.tolist())
+            print(self.start_probs)
+            print('shape of self.end_probs:',
+                  self.end_probs.get_shape.tolist())
+            print(self.end_probs)
             # Both are tensors
-            print(self.sess.run(self.start_probs, feed_dict))
-            # print(self.sess.run(self.end_probs))
+            start = self.sess.run(self.start_probs, feed_dict)
+            end = self.sess.run(self.end_probs, feed_dict)
+            print('shape of start:', start.shape)
+            print('start:', start)
+            print('shape of end:', end.shape)
+            print('end:', end)
+            print('start == end:', start == end)
+
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             print('2.2 in _train_epoch in rc_model.py')
             total_loss += loss * len(batch['raw_data'])
@@ -309,7 +321,7 @@ class RCModel(object):
             self.logger.info('Training the model for epoch {}'.format(epoch))
             train_batches = data.gen_mini_batches('train', batch_size, pad_id,
                                                   shuffle=True)
-            print('train_batches in rc_model.py:', train_batches)
+            print('2 train_batches in train() rc_model.py:', train_batches)
             train_loss = self._train_epoch(train_batches, dropout_keep_prob)
             self.logger.info('Average train loss for epoch {} is {}'.format(epoch, train_loss))
             print('3 in rc_model.py')
