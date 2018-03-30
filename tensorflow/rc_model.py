@@ -271,6 +271,7 @@ class RCModel(object):
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
             print('2.1 in _train_epoch in rc_model.py')
+            print(self.sess.run([self.train_op, self.loss], feed_dict))
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             print('2.2 in _train_epoch in rc_model.py')
             total_loss += loss * len(batch['raw_data'])
