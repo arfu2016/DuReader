@@ -298,10 +298,10 @@ class RCModel(object):
             # print('fw:', fw)
             # print('fw2:', fw2)
             # print('bw:', bw)
-            fw_cell = self.sess.run(self.fw_cell, feed_dict)
-            bw_cell = self.sess.run(self.bw_cell, feed_dict)
+            # fw_cell = self.sess.run(self.fw_cell, feed_dict)
+            # bw_cell = self.sess.run(self.bw_cell, feed_dict)
             # 实例也是动态生成的
-            print('fw_cell==bw_cell:', fw_cell==bw_cell)
+            print('fw_cell==bw_cell:', self.fw_cell == self.bw_cell)
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             print('2.2 in _train_epoch in rc_model.py')
