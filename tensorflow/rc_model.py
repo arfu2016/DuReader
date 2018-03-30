@@ -275,10 +275,10 @@ class RCModel(object):
             # print('feed_dict in rc_model.py:', feed_dict)
             print('2.1 in _train_epoch in rc_model.py')
             print('shape of self.start_probs:',
-                  self.start_probs.get_shape.as_list())
+                  self.start_probs.get_shape().as_list())
             print(self.start_probs)
             print('shape of self.end_probs:',
-                  self.end_probs.get_shape.as_list())
+                  self.end_probs.get_shape().as_list())
             print(self.end_probs)
             # Both are tensors
             start = self.sess.run(self.start_probs, feed_dict)
