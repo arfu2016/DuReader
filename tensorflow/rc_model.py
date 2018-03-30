@@ -201,7 +201,8 @@ class RCModel(object):
             # 文章信息
             no_dup_question_encodes = tf.reshape(
                 self.sep_q_encodes,
-                [batch_size, -1, tf.shape(self.sep_q_encodes)[1], 2 * self.hidden_size]
+                [batch_size, -1, tf.shape(self.sep_q_encodes)[1],
+                 2 * self.hidden_size]
             )[0:, 0, 0:, 0:]
             # 问题信息
         decoder = PointerNetDecoder(self.hidden_size)
@@ -261,7 +262,8 @@ class RCModel(object):
             dropout_keep_prob: float value indicating dropout keep probability
         """
         total_num, total_loss = 0, 0
-        log_every_n_batch, n_batch_loss = 50, 0
+        # log_every_n_batch, n_batch_loss = 50, 0
+        log_every_n_batch, n_batch_loss = 1, 0
         for bitx, batch in enumerate(train_batches, 1):
             feed_dict = {self.p: batch['passage_token_ids'],
                          self.q: batch['question_token_ids'],
@@ -273,8 +275,8 @@ class RCModel(object):
             print('2.1 in _train_epoch in rc_model.py')
             print(self.start_probs, self.end_probs)
             # Both are tensors
-            print(self.sess.run(self.start_probs))
-            print(self.sess.run(self.end_probs))
+            print(self.sess.run(self.start_probs, feed_dict))
+            # print(self.sess.run(self.end_probs))
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             print('2.2 in _train_epoch in rc_model.py')
             total_loss += loss * len(batch['raw_data'])
