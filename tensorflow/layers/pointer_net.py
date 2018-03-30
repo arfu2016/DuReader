@@ -224,4 +224,6 @@ class PointerNetDecoder(object):
             # print('end_prob in pointer_net.py in layers in tensorflow:',
             #       end_prob)
             # print('Compare start_prob == end_prob:', start_prob == end_prob)
-            return fw_outputs[0:, 0, 0:], fw_outputs2[0:, 0, 0:], bw_outputs[0:, 0, 0:]
+            # return fw_outputs[0:, 0, 0:], fw_outputs2[0:, 0, 0:],
+            # bw_outputs[0:, 0, 0:]
+            return fw_cell, bw_cell
