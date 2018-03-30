@@ -206,10 +206,10 @@ class RCModel(object):
             )[0:, 0, 0:, 0:]
             # 问题信息
         decoder = PointerNetDecoder(self.hidden_size)
-        # self.fw_outputs, self.fw_outputs2, self.bw_outputs = \
-        #     decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
-        self.fw_cell, self.bw_cell, self.fw_cell1 = \
+        self.fw_outputs, self.fw_outputs2, self.bw_outputs = \
             decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
+        # self.fw_cell, self.bw_cell, self.fw_cell1 = \
+        #     decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
         self.start_probs, self.end_probs = decoder.decode(concat_passage_encodes,
                                                           no_dup_question_encodes)
 
@@ -292,17 +292,18 @@ class RCModel(object):
             print('shape of end:', end.shape)
             print('end:', end)
             print('start == end:', start == end)
-            # fw = self.sess.run(self.fw_outputs, feed_dict)
-            # fw2 = self.sess.run(self.fw_outputs2, feed_dict)
-            # bw = self.sess.run(self.bw_outputs, feed_dict)
-            # print('fw:', fw)
-            # print('fw2:', fw2)
-            # print('bw:', bw)
-            # fw_cell = self.sess.run(self.fw_cell, feed_dict)
-            # bw_cell = self.sess.run(self.bw_cell, feed_dict)
-            # 实例也是动态生成的
-            print('fw_cell==bw_cell:', self.fw_cell == self.bw_cell)
-            print('fw_cell==fw_cell1:', self.fw_cell == self.fw_cell1)
+            fw = self.sess.run(self.fw_outputs, feed_dict)
+            fw2 = self.sess.run(self.fw_outputs2, feed_dict)
+            bw = self.sess.run(self.bw_outputs, feed_dict)
+            print('fw:', fw)
+            print('fw2:', fw2)
+            print('bw:', bw)
+
+            # 实例也是动态生成的?
+            # print('fw_cell==bw_cell:', self.fw_cell == self.bw_cell)
+            # print('type of fw_cell', type(self.fw_cell))
+            # print('type of fw_cell1', type(self.fw_cell1))
+            # print('fw_cell==fw_cell1:', self.fw_cell == self.fw_cell1)
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             print('2.2 in _train_epoch in rc_model.py')

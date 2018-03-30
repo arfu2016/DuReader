@@ -220,7 +220,7 @@ class PointerNetDecoder(object):
 
             with tf.variable_scope('fw2', reuse=True):
                 fw_cell1 = PointerNetLSTMCell(self.hidden_size, passage_vectors)
-                fw_outputs2, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
+                fw_outputs2, _ = custom_dynamic_rnn(fw_cell1, fake_inputs,
                                                     sequence_len, init_state)
 
             with tf.variable_scope('bw2'):
@@ -234,6 +234,5 @@ class PointerNetDecoder(object):
             # print('end_prob in pointer_net.py in layers in tensorflow:',
             #       end_prob)
             # print('Compare start_prob == end_prob:', start_prob == end_prob)
-            # return fw_outputs[0:, 0, 0:], fw_outputs2[0:, 0, 0:],
-            # bw_outputs[0:, 0, 0:]
-            return fw_cell, bw_cell, fw_cell1
+            return fw_outputs[0:, 0, 0:], fw_outputs2[0:, 0, 0:], bw_outputs[0:, 0, 0:]
+            # return fw_cell, bw_cell, fw_cell1
