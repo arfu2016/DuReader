@@ -209,8 +209,9 @@ class PointerNetDecoder(object):
                 fw_outputs, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
                                                    sequence_len, init_state)
 
+            with tf.variable_scope('fw2', reuse=True):
                 fw_outputs2, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
-                                                   sequence_len, init_state)
+                                                    sequence_len, init_state)
 
             with tf.variable_scope('bw2'):
                 bw_cell = PointerNetLSTMCell(self.hidden_size, passage_vectors)
