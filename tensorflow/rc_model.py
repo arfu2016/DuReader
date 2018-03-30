@@ -272,13 +272,13 @@ class RCModel(object):
                          self.start_label: batch['start_id'],
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
-            print('feed_dict in rc_model.py:', feed_dict)
+            # print('feed_dict in rc_model.py:', feed_dict)
             print('2.1 in _train_epoch in rc_model.py')
             print('shape of self.start_probs:',
-                  self.start_probs.get_shape.tolist())
+                  self.start_probs.get_shape.as_list())
             print(self.start_probs)
             print('shape of self.end_probs:',
-                  self.end_probs.get_shape.tolist())
+                  self.end_probs.get_shape.as_list())
             print(self.end_probs)
             # Both are tensors
             start = self.sess.run(self.start_probs, feed_dict)
