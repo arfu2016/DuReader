@@ -21,8 +21,8 @@ reload(sys)
 # 的变量有可能发生变化，比如rc_model.py中就修改了sys.path
 
 # os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-# "TF_CPP_MIN_LOG_LEVEL"是控制tensorflow的环境变量，0输出所有信息？还是1？
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+# "TF_CPP_MIN_LOG_LEVEL"是控制tensorflow的环境变量，0输出所有信息
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "0"
 
 
 # python run_python3.py --train --algo MLSTM --epochs 2 --batch_size 16

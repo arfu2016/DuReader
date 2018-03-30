@@ -266,7 +266,9 @@ class RCModel(object):
                          self.start_label: batch['start_id'],
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
+            print('2.1 in _train_epoch in rc_model.py')
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
+            print('2.2 in _train_epoch in rc_model.py')
             total_loss += loss * len(batch['raw_data'])
             total_num += len(batch['raw_data'])
             n_batch_loss += loss
@@ -297,7 +299,7 @@ class RCModel(object):
             self.logger.info('Training the model for epoch {}'.format(epoch))
             train_batches = data.gen_mini_batches('train', batch_size, pad_id,
                                                   shuffle=True)
-            print('2 in rc_model.py')
+            print('train_batches in rc_model.py:', train_batches)
             train_loss = self._train_epoch(train_batches, dropout_keep_prob)
             self.logger.info('Average train loss for epoch {} is {}'.format(epoch, train_loss))
             print('3 in rc_model.py')
