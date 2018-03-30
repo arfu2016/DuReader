@@ -172,9 +172,9 @@ class PointerNetDecoder(object):
                 bw_outputs, _ = custom_dynamic_rnn(bw_cell, fake_inputs, sequence_len, init_state)
             start_prob = (fw_outputs[0:, 0, 0:] + bw_outputs[0:, 1, 0:]) / 2
             end_prob = (fw_outputs[0:, 1, 0:] + bw_outputs[0:, 0, 0:]) / 2
-            print('start_prob in pointer_net.py in layers in tensorflow:',
+            tf.Print('start_prob in pointer_net.py in layers in tensorflow:',
                   start_prob)
-            print('end_prob in pointer_net.py in layers in tensorflow:',
+            tf.Print('end_prob in pointer_net.py in layers in tensorflow:',
                   end_prob)
             print('Compare start_prob == end_prob:', start_prob == end_prob)
             return start_prob, end_prob
