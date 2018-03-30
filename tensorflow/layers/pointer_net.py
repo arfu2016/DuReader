@@ -44,6 +44,7 @@ def custom_dynamic_rnn(cell, inputs, inputs_len, initial_state=None):
     inputs_ta = tf.TensorArray(dtype=tf.float32, size=max_time)
     inputs_ta = inputs_ta.unstack(tf.transpose(inputs, [1, 0, 2]))
     emit_ta = tf.TensorArray(dtype=tf.float32, dynamic_size=True, size=0)
+    # 不指定初始化的具体值时，随机初始化？当reuse的时候，使用之前的emit_ta?
     t0 = tf.constant(0, dtype=tf.int32)
     if initial_state is not None:
         s0 = initial_state
@@ -219,7 +220,7 @@ class PointerNetDecoder(object):
                                                    sequence_len, init_state)
 
             with tf.variable_scope('fw2', reuse=True):
-                # fw_cell1 = PointerNetLSTMCell(self.hidden_size, passage_vectors)
+                fw_cell1 = PointerNetLSTMCell(self.hidden_size, passage_vectors)
                 fw_outputs2, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
                                                     sequence_len, init_state)
 
