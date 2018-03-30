@@ -178,3 +178,49 @@ class PointerNetDecoder(object):
             #       end_prob)
             # print('Compare start_prob == end_prob:', start_prob == end_prob)
             return start_prob, end_prob
+
+    def decode2(self, passage_vectors, question_vectors, init_with_question=True):
+        """
+        Use Pointer Network to compute the probabilities of each position
+        to be start and end of the answer
+        Args:
+            passage_vectors: the encoded passage vectors
+            question_vectors: the encoded question vectors
+            init_with_question: if set to be true,
+                             we will use the question_vectors to init the state of Pointer Network
+        Returns:
+            the probs of evary position to be start and end of the answer
+        """
+        with tf.variable_scope('pn_decoder'):
+            fake_inputs = tf.zeros([tf.shape(passage_vectors)[0], 2, 1])  # not used
+            sequence_len = tf.tile([2], [tf.shape(passage_vectors)[0]])
+            if init_with_question:
+                random_attn_vector = tf.Variable(tf.random_normal([1, self.hidden_size]),
+                                                 trainable=True, name="random_attn_vector")
+                pooled_question_rep = tc.layers.fully_connected(
+                    attend_pooling(question_vectors, random_attn_vector, self.hidden_size),
+                    num_outputs=self.hidden_size, activation_fn=None
+                )
+                init_state = tc.rnn.LSTMStateTuple(pooled_question_rep, pooled_question_rep)
+            else:
+                init_state = None
+            with tf.variable_scope('fw'):
+                fw_cell = PointerNetLSTMCell(self.hidden_size, passage_vectors)
+                fw_outputs, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
+                                                   sequence_len, init_state)
+
+                fw_outputs2, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
+                                                   sequence_len, init_state)
+
+            with tf.variable_scope('bw'):
+                bw_cell = PointerNetLSTMCell(self.hidden_size, passage_vectors)
+                bw_outputs, _ = custom_dynamic_rnn(bw_cell, fake_inputs,
+                                                   sequence_len, init_state)
+            start_prob = (fw_outputs[0:, 0, 0:] + bw_outputs[0:, 1, 0:]) / 2
+            end_prob = (fw_outputs[0:, 1, 0:] + bw_outputs[0:, 0, 0:]) / 2
+            # print('start_prob in pointer_net.py in layers in tensorflow:',
+            #       start_prob)
+            # print('end_prob in pointer_net.py in layers in tensorflow:',
+            #       end_prob)
+            # print('Compare start_prob == end_prob:', start_prob == end_prob)
+            return fw_outputs[0:, 0, 0:], fw_outputs2[0:, 0, 0:], bw_outputs[0:, 0, 0:]

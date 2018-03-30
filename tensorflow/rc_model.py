@@ -206,6 +206,8 @@ class RCModel(object):
             )[0:, 0, 0:, 0:]
             # 问题信息
         decoder = PointerNetDecoder(self.hidden_size)
+        self.fw_outputs, self.fw_outputs2, self.bw_outputs = \
+            decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
         self.start_probs, self.end_probs = decoder.decode(concat_passage_encodes,
                                                           no_dup_question_encodes)
 
@@ -288,6 +290,12 @@ class RCModel(object):
             print('shape of end:', end.shape)
             print('end:', end)
             print('start == end:', start == end)
+            fw = self.sess.run(self.fw_outputs, feed_dict)
+            fw2 = self.sess.run(self.fw_outputs2, feed_dict)
+            bw = self.sess.run(self.bw_outputs, feed_dict)
+            print('fw:', fw)
+            print('fw2:', fw2)
+            print('bw:', bw)
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             print('2.2 in _train_epoch in rc_model.py')
