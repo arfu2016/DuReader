@@ -39,6 +39,7 @@ def custom_dynamic_rnn(cell, inputs, inputs_len, initial_state=None):
     """
     batch_size = tf.shape(inputs)[0]
     max_time = tf.shape(inputs)[1]
+    # 就是各个batch的输入的长度的最大值，不足这个长度的用0补足，叫做max_time
 
     inputs_ta = tf.TensorArray(dtype=tf.float32, size=max_time)
     inputs_ta = inputs_ta.unstack(tf.transpose(inputs, [1, 0, 2]))
@@ -170,6 +171,7 @@ class PointerNetDecoder(object):
             with tf.variable_scope('bw'):
                 bw_cell = PointerNetLSTMCell(self.hidden_size, passage_vectors)
                 bw_outputs, _ = custom_dynamic_rnn(bw_cell, fake_inputs, sequence_len, init_state)
+            # 又一次使用了bidirectional lstm，一个lstm从左到右，一个lstm从右到左
             start_prob = (fw_outputs[0:, 0, 0:] + bw_outputs[0:, 1, 0:]) / 2
             end_prob = (fw_outputs[0:, 1, 0:] + bw_outputs[0:, 0, 0:]) / 2
             # print('start_prob in pointer_net.py in layers in tensorflow:',
@@ -181,6 +183,7 @@ class PointerNetDecoder(object):
 
     def decode2(self, passage_vectors, question_vectors, init_with_question=True):
         """
+        Used for debugging
         Use Pointer Network to compute the probabilities of each position
         to be start and end of the answer
         Args:
@@ -206,10 +209,17 @@ class PointerNetDecoder(object):
                 init_state = None
             with tf.variable_scope('fw2'):
                 fw_cell = PointerNetLSTMCell(self.hidden_size, passage_vectors)
+                # 这个类的初始化其实不只需要以上两个参数，比如还需要weights，但weights
+                # 的初始化在没有传参数的情况下是自动调用随机函数来进行的
+                # 也是因为这种随机性，造成fw_cell和bw_cell的不同，也可以解释为什么
+                # 刚开始的时候start_prob和end_prob不同，但又很接近
+                # 在拟合数据的过程中，fw/weights和bw/weights会渐渐分化，所以
+                # start_prob和end_prob差距会变大
                 fw_outputs, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
                                                    sequence_len, init_state)
 
             with tf.variable_scope('fw2', reuse=True):
+                fw_cell1 = PointerNetLSTMCell(self.hidden_size, passage_vectors)
                 fw_outputs2, _ = custom_dynamic_rnn(fw_cell, fake_inputs,
                                                     sequence_len, init_state)
 
@@ -226,4 +236,4 @@ class PointerNetDecoder(object):
             # print('Compare start_prob == end_prob:', start_prob == end_prob)
             # return fw_outputs[0:, 0, 0:], fw_outputs2[0:, 0, 0:],
             # bw_outputs[0:, 0, 0:]
-            return fw_cell, bw_cell
+            return fw_cell, bw_cell, fw_cell1

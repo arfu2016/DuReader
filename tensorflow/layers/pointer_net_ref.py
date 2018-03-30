@@ -65,6 +65,8 @@ def custom_dynamic_rnn(cell, inputs, inputs_len, initial_state=None):
     inputs_ta = tf.TensorArray(dtype=tf.float32, size=max_time)
     inputs_ta = inputs_ta.unstack(tf.transpose(inputs, [1, 0, 2]))
     emit_ta = tf.TensorArray(dtype=tf.float32, dynamic_size=True, size=0)
+    # 本质上就是rnn中的weights, 在x轴上连接不同的cell，在拟合数据时会不断更新
+    # tf.TensorArray和tf.Variable本质上是相同的，都是在拟合数据中可变的
     t0 = tf.constant(0, dtype=tf.int32)
     # 用到了tf.constant，此处没有用tf.placeholder
     if initial_state is not None:
@@ -167,6 +169,7 @@ class PointerNetLSTMCell(tc.rnn.LSTMCell):
                                                     num_outputs=self._num_units,
                                                     activation_fn=None)
         # 为操作attend函数做准备，表明这个lstm cell被调用时返回的是attend操作之后的结果
+        # lstm cell内部的weights已经由super().__init__()设定好了，属于tf.Variable
 
     def __call__(self, inputs, state, scope=None):
         (c_prev, m_prev) = state

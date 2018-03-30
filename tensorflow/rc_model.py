@@ -208,7 +208,7 @@ class RCModel(object):
         decoder = PointerNetDecoder(self.hidden_size)
         # self.fw_outputs, self.fw_outputs2, self.bw_outputs = \
         #     decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
-        self.fw_cell, self.bw_cell = \
+        self.fw_cell, self.bw_cell, self.fw_cell1 = \
             decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
         self.start_probs, self.end_probs = decoder.decode(concat_passage_encodes,
                                                           no_dup_question_encodes)
@@ -302,6 +302,7 @@ class RCModel(object):
             # bw_cell = self.sess.run(self.bw_cell, feed_dict)
             # 实例也是动态生成的
             print('fw_cell==bw_cell:', self.fw_cell == self.bw_cell)
+            print('fw_cell==fw_cell1:', self.fw_cell == self.fw_cell1)
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             print('2.2 in _train_epoch in rc_model.py')
