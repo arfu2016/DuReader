@@ -269,8 +269,8 @@ class RCModel(object):
         total_num, total_loss = 0, 0
         # log_every_n_batch, n_batch_loss = 50, 0
         log_every_n_batch, n_batch_loss = 1, 0
-        print('len(train_batches) in _train_epoch in rc_model.py:',
-              len(list(train_batches)))
+        # print('len(train_batches) in _train_epoch in rc_model.py:',
+        #       len(list(train_batches)))
         for bitx, batch in enumerate(train_batches, 1):
             print('bitx in rc_model.py', bitx)
             feed_dict = {self.p: batch['passage_token_ids'],
