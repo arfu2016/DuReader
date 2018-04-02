@@ -315,8 +315,12 @@ class RCModel(object):
                               if gradient[0] is None]
             print('gradients_none in _train_epoch in rc_model.py:',
                   len(gradients_none))
-            results_g = self.sess.run(gradients, feed_dict)
+            capped_gradients = [(tf.clip_by_value(grad, -1., 1.), var) for
+                                grad, var in gradients if grad is not None]
+            results_g = self.sess.run(capped_gradients, feed_dict)
             print('results_g in _train_epoch in rc_model.py:', results_g)
+
+            train_op = self.optimizer.apply_gradients(capped_gradients)
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             print('2.2 in _train_epoch in rc_model.py')
