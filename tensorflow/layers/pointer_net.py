@@ -175,11 +175,11 @@ class PointerNetDecoder(object):
             # 又一次使用了bidirectional lstm，一个lstm从左到右，一个lstm从右到左
             start_prob = (fw_outputs[0:, 0, 0:] + bw_outputs[0:, 1, 0:]) / 2
             end_prob = (fw_outputs[0:, 1, 0:] + bw_outputs[0:, 0, 0:]) / 2
-            # print('start_prob in pointer_net.py in layers in tensorflow:',
-            #       start_prob)
-            # print('end_prob in pointer_net.py in layers in tensorflow:',
-            #       end_prob)
-            # print('Compare start_prob == end_prob:', start_prob == end_prob)
+            print('start_prob in pointer_net.py in layers in tensorflow:',
+                  start_prob)
+            print('end_prob in pointer_net.py in layers in tensorflow:',
+                  end_prob)
+            print('Compare start_prob == end_prob:', start_prob == end_prob)
             return start_prob, end_prob
 
     def decode2(self, passage_vectors, question_vectors, init_with_question=True):
