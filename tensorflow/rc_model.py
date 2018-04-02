@@ -282,26 +282,26 @@ class RCModel(object):
                          self.dropout_keep_prob: dropout_keep_prob}
             # print('feed_dict in rc_model.py:', feed_dict)
             print('2.1 in _train_epoch in rc_model.py')
-            print('shape of self.start_probs:',
-                  self.start_probs.get_shape().as_list())
-            print(self.start_probs)
-            print('shape of self.end_probs:',
-                  self.end_probs.get_shape().as_list())
-            print(self.end_probs)
+            # print('shape of self.start_probs:',
+            #       self.start_probs.get_shape().as_list())
+            # print(self.start_probs)
+            # print('shape of self.end_probs:',
+            #       self.end_probs.get_shape().as_list())
+            # print(self.end_probs)
             # Both are tensors
             start = self.sess.run(self.start_probs, feed_dict)
             end = self.sess.run(self.end_probs, feed_dict)
             print('shape of start:', start.shape)
-            print('start:', start)
+            # print('start:', start)
             print('shape of end:', end.shape)
-            print('end:', end)
-            print('start == end:', start == end)
-            fw = self.sess.run(self.fw_outputs, feed_dict)
-            fw2 = self.sess.run(self.fw_outputs2, feed_dict)
-            bw = self.sess.run(self.bw_outputs, feed_dict)
-            print('fw:', fw)
-            print('fw2:', fw2)
-            print('bw:', bw)
+            # print('end:', end)
+            # print('start == end:', start == end)
+            # fw = self.sess.run(self.fw_outputs, feed_dict)
+            # fw2 = self.sess.run(self.fw_outputs2, feed_dict)
+            # bw = self.sess.run(self.bw_outputs, feed_dict)
+            # print('fw:', fw)
+            # print('fw2:', fw2)
+            # print('bw:', bw)
 
             # 实例也是动态生成的?
             # print('fw_cell==bw_cell:', self.fw_cell == self.bw_cell)
@@ -311,10 +311,10 @@ class RCModel(object):
 
             loss = self.sess.run(self.loss, feed_dict)
             print('loss in _train_epoch in rc_model.py:', loss)
-            print('All parameters in rc_model.py', self.all_params)
+            # print('All parameters in rc_model.py', self.all_params)
             gradients = self.optimizer.compute_gradients(self.loss,
                                                          self.all_params)
-            print('gradients in _train_epoch in rc_model.py:', gradients)
+            # print('gradients in _train_epoch in rc_model.py:', gradients)
             gradients_none = [gradient for gradient in gradients
                               if gradient[0] is None]
             print('gradients_none in _train_epoch in rc_model.py:',
