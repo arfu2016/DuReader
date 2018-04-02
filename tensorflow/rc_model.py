@@ -270,7 +270,7 @@ class RCModel(object):
         # log_every_n_batch, n_batch_loss = 50, 0
         log_every_n_batch, n_batch_loss = 1, 0
         print('len(train_batches) in _train_epoch in rc_model.py:',
-              len(train_batches))
+              len(list(train_batches)))
         for bitx, batch in enumerate(train_batches, 1):
             feed_dict = {self.p: batch['passage_token_ids'],
                          self.q: batch['question_token_ids'],
