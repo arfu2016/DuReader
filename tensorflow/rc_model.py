@@ -309,7 +309,11 @@ class RCModel(object):
             print('loss in _train_epoch in rc_model.py:', loss)
             gradients = self.optimizer.compute_gradients(self.loss,
                                                          self.all_params)
-            print('gradients in _train_epoch in rc_model.py:', len(gradients))
+            print('gradients in _train_epoch in rc_model.py:', gradients)
+            gradients_none = [gradient for gradient in gradients
+                              if gradient is None]
+            print('gradients_none in _train_epoch in rc_model.py:',
+                  len(gradients_none))
             results_g = self.sess.run(gradients, feed_dict)
             print('results_g in _train_epoch in rc_model.py:', results_g)
 
