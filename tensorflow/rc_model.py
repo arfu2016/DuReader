@@ -74,7 +74,7 @@ class RCModel(object):
         # 使用了组合
 
         # session info
-        sess_config = tf.ConfigProto(log_device_placement=True)
+        # sess_config = tf.ConfigProto(log_device_placement=True)
         # To find out which devices your operations and tensors
         # are assigned to,
         # create the session with log_device_placement configuration
