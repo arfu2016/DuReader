@@ -25,7 +25,7 @@ reload(sys)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "0"
 
 
-# python run_python3.py --train --algo MLSTM --epochs 2 --batch_size 16
+# python run_python3.py --train --algo MLSTM --epochs 2 --batch_size 1
 
 def parse_args():
     """

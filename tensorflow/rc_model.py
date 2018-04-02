@@ -305,6 +305,12 @@ class RCModel(object):
             # print('type of fw_cell1', type(self.fw_cell1))
             # print('fw_cell==fw_cell1:', self.fw_cell == self.fw_cell1)
 
+            loss = self.sess.run(self.loss, feed_dict)
+            print('loss in _train_epoch in rc_model.py:', loss)
+            gradients = self.optimizer.compute_gradients(self.loss)
+            results_g = self.sess.run(gradients, feed_dict)
+            print('gradients in _train_epoch in rc_model.py:', results_g)
+
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             print('2.2 in _train_epoch in rc_model.py')
             total_loss += loss * len(batch['raw_data'])
