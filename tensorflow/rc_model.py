@@ -311,7 +311,7 @@ class RCModel(object):
                                                          self.all_params)
             print('gradients in _train_epoch in rc_model.py:', gradients)
             gradients_none = [gradient for gradient in gradients
-                              if gradient is None]
+                              if gradient[0] is None]
             print('gradients_none in _train_epoch in rc_model.py:',
                   len(gradients_none))
             results_g = self.sess.run(gradients, feed_dict)
