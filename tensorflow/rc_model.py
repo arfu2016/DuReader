@@ -272,6 +272,7 @@ class RCModel(object):
         print('len(train_batches) in _train_epoch in rc_model.py:',
               len(list(train_batches)))
         for bitx, batch in enumerate(train_batches, 1):
+            print('bitx in rc_model.py', bitx)
             feed_dict = {self.p: batch['passage_token_ids'],
                          self.q: batch['question_token_ids'],
                          self.p_length: batch['passage_length'],
@@ -328,9 +329,12 @@ class RCModel(object):
             train_op = self.optimizer.apply_gradients(capped_gradients)
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
+
             print('2.2 in _train_epoch in rc_model.py')
+
             total_loss += loss * len(batch['raw_data'])
             total_num += len(batch['raw_data'])
+            print('total_num in rc_model.py', total_num)
             n_batch_loss += loss
             if log_every_n_batch > 0 and bitx % log_every_n_batch == 0:
                 self.logger.info('Average loss from batch {} to {} is {}'.format(
