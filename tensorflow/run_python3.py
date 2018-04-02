@@ -22,7 +22,7 @@ reload(sys)
 
 # os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 # "TF_CPP_MIN_LOG_LEVEL"是控制tensorflow的环境变量，0输出所有信息
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "0"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
 # python run_python3.py --train --algo MLSTM --epochs 2 --batch_size 1
