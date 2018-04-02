@@ -77,10 +77,10 @@ def cook_test(test, reflen_refmaxcounts, eff=None, n=4):
 
     result["testlen"] = testlen
 
-    result["guess"] = [max(0,testlen-k+1) for k in xrange(1,n+1)]
+    result["guess"] = [max(0,testlen-k+1) for k in range(1, n+1)]
 
     result['correct'] = [0]*n
-    for (ngram, count) in counts.iteritems():
+    for (ngram, count) in counts.items():
         result["correct"][len(ngram)-1] += min(refmaxcounts.get(ngram,0), count)
 
     return result

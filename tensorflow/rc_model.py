@@ -345,7 +345,7 @@ class RCModel(object):
         return 1.0 * total_loss / total_num
 
     def train(self, data, epochs, batch_size, save_dir, save_prefix,
-              dropout_keep_prob=1.0, evaluate=True):
+              dropout_keep_prob=1.0, evaluate=False):
         """
         Train the model with data
         Args:
