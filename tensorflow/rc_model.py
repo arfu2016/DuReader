@@ -307,6 +307,7 @@ class RCModel(object):
 
             loss = self.sess.run(self.loss, feed_dict)
             print('loss in _train_epoch in rc_model.py:', loss)
+            print('All parameters in rc_model.py', self.all_params)
             gradients = self.optimizer.compute_gradients(self.loss,
                                                          self.all_params)
             print('gradients in _train_epoch in rc_model.py:', gradients)
