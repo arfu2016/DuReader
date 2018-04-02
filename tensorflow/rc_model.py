@@ -324,8 +324,8 @@ class RCModel(object):
             print('capped_gradients in _train_epoch in rc_model.py:',
                   len(capped_gradients))
             print('capped_gradients[1] in _train_epoch in rc_model.py:',
-                  capped_gradients[1])
-            results_g = self.sess.run(capped_gradients[1], feed_dict)
+                  capped_gradients[1][0])
+            results_g = self.sess.run(capped_gradients[1][0], feed_dict)
             print('results_g in _train_epoch in rc_model.py:', results_g)
 
             train_op = self.optimizer.apply_gradients(capped_gradients)
