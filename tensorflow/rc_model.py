@@ -269,7 +269,8 @@ class RCModel(object):
         total_num, total_loss = 0, 0
         # log_every_n_batch, n_batch_loss = 50, 0
         log_every_n_batch, n_batch_loss = 1, 0
-        print('train_batches in _train_epoch in rc_model.py:', train_batches)
+        print('len(train_batches) in _train_epoch in rc_model.py:',
+              len(train_batches))
         for bitx, batch in enumerate(train_batches, 1):
             feed_dict = {self.p: batch['passage_token_ids'],
                          self.q: batch['question_token_ids'],
@@ -319,7 +320,9 @@ class RCModel(object):
                   len(gradients_none))
             capped_gradients = [(tf.clip_by_value(grad, -1., 1.), var) for
                                 grad, var in gradients if grad is not None]
-            results_g = self.sess.run(capped_gradients, feed_dict)
+            print('capped_gradients in _train_epoch in rc_model.py:',
+                  len(capped_gradients))
+            results_g = self.sess.run(capped_gradients[1], feed_dict)
             print('results_g in _train_epoch in rc_model.py:', results_g)
 
             train_op = self.optimizer.apply_gradients(capped_gradients)
