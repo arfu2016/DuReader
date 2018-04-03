@@ -175,8 +175,14 @@ def train(args):
     # 结果保存在brc_data中
     logger.info('Initialize the model...')
     rc_model = RCModel(vocab, args)
+    try:
+        rc_model.restore(model_dir=args.model_dir, model_prefix=args.algo)
+    except Exception as e:
+        print('Exception in train() in run_python3.py', e)
+        print('Initialize the model from beginning')
     logger.info('Training the model...')
-    rc_model.train(brc_data, args.epochs, args.batch_size, save_dir=args.model_dir,
+    rc_model.train(brc_data, args.epochs, args.batch_size,
+                   save_dir=args.model_dir,
                    save_prefix=args.algo,
                    dropout_keep_prob=args.dropout_keep_prob)
     logger.info('Done with model training!')
