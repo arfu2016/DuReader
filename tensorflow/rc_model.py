@@ -85,6 +85,17 @@ class RCModel(object):
 
         self._build_graph()
 
+        gradients = self.optimizer.compute_gradients(self.loss,
+                                                     self.all_params)
+        # print('gradients in _train_epoch in rc_model.py:', gradients)
+        self.capped_gradients = [(tf.clip_by_value(grad, -1., 1.), var) for
+                                 grad, var in gradients if grad is not None]
+        # print('capped_gradients in _train_epoch in rc_model.py:',
+        #       len(capped_gradients))
+        # print('capped_gradients[1] in _train_epoch in rc_model.py:',
+        #       capped_gradients[1][0])
+        train_op = self.optimizer.apply_gradients(self.capped_gradients)
+
         # save info
         self.saver = tf.train.Saver()
 
@@ -312,23 +323,14 @@ class RCModel(object):
             loss = self.sess.run(self.loss, feed_dict)
             print('loss in _train_epoch in rc_model.py:', loss)
             # print('All parameters in rc_model.py', self.all_params)
-            gradients = self.optimizer.compute_gradients(self.loss,
-                                                         self.all_params)
-            # print('gradients in _train_epoch in rc_model.py:', gradients)
-            gradients_none = [gradient for gradient in gradients
-                              if gradient[0] is None]
-            print('gradients_none in _train_epoch in rc_model.py:',
-                  len(gradients_none))
-            capped_gradients = [(tf.clip_by_value(grad, -1., 1.), var) for
-                                grad, var in gradients if grad is not None]
-            print('capped_gradients in _train_epoch in rc_model.py:',
-                  len(capped_gradients))
-            print('capped_gradients[1] in _train_epoch in rc_model.py:',
-                  capped_gradients[1][0])
-            results_g = self.sess.run(capped_gradients[1][0], feed_dict)
-            print('results_g in _train_epoch in rc_model.py:', results_g)
 
-            train_op = self.optimizer.apply_gradients(capped_gradients)
+            # gradients_none = [gradient for gradient in gradients
+            #                   if gradient[0] is None]
+            # print('gradients_none in _train_epoch in rc_model.py:',
+            #       len(gradients_none))
+
+            results_g = self.sess.run(self.capped_gradients[1][0], feed_dict)
+            print('results_g in _train_epoch in rc_model.py:', results_g)
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
 
