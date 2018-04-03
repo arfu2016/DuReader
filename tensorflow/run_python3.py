@@ -176,7 +176,8 @@ def train(args):
     logger.info('Initialize the model...')
     rc_model = RCModel(vocab, args)
     try:
-        rc_model.restore(model_dir=args.model_dir, model_prefix=args.algo)
+        rc_model.restore(model_dir=args.model_dir,
+                         model_prefix=args.algo + '_' + str(2))
     except Exception as e:
         print('Exception in train() in run_python3.py', e)
         print('Initialize the model from beginning')
