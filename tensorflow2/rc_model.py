@@ -30,10 +30,10 @@ import numpy as np
 import tensorflow as tf
 import sys
 
-from tensorflow.layers.basic_rnn import rnn
-from tensorflow.layers.match_layer import MatchLSTMLayer
-from tensorflow.layers.match_layer import AttentionFlowMatchLayer
-from tensorflow.layers.pointer_net import PointerNetDecoder
+from tensorflow2.layers.basic_rnn import rnn
+from tensorflow2.layers.match_layer import MatchLSTMLayer
+from tensorflow2.layers.match_layer import AttentionFlowMatchLayer
+from tensorflow2.layers.pointer_net import PointerNetDecoder
 
 # file_dir = os.path.dirname(os.path.abspath(__file__))
 # utils_dir = os.path.dirname(file_dir)

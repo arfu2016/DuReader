@@ -175,9 +175,9 @@ class PointerNetDecoder(object):
             # 又一次使用了bidirectional lstm，一个lstm从左到右，一个lstm从右到左
             start_prob = (fw_outputs[0:, 0, 0:] + bw_outputs[0:, 1, 0:]) / 2
             end_prob = (fw_outputs[0:, 1, 0:] + bw_outputs[0:, 0, 0:]) / 2
-            print('start_prob in pointer_net.py in layers in tensorflow:',
+            print('start_prob in pointer_net.py in layers in tensorflow2:',
                   start_prob)
-            print('end_prob in pointer_net.py in layers in tensorflow:',
+            print('end_prob in pointer_net.py in layers in tensorflow2:',
                   end_prob)
             print('Compare start_prob == end_prob:', start_prob == end_prob)
             return start_prob, end_prob
@@ -235,9 +235,9 @@ class PointerNetDecoder(object):
                                                    sequence_len, init_state)
             start_prob = (fw_outputs[0:, 0, 0:] + bw_outputs[0:, 1, 0:]) / 2
             end_prob = (fw_outputs[0:, 1, 0:] + bw_outputs[0:, 0, 0:]) / 2
-            # print('start_prob in pointer_net.py in layers in tensorflow:',
+            # print('start_prob in pointer_net.py in layers in tensorflow2:',
             #       start_prob)
-            # print('end_prob in pointer_net.py in layers in tensorflow:',
+            # print('end_prob in pointer_net.py in layers in tensorflow2:',
             #       end_prob)
             # print('Compare start_prob == end_prob:', start_prob == end_prob)
             return fw_outputs[0:, 0, 0:], fw_outputs2[0:, 0, 0:], bw_outputs[0:, 0, 0:]
