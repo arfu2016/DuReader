@@ -94,7 +94,7 @@ class RCModel(object):
         #       len(capped_gradients))
         # print('capped_gradients[1] in _train_epoch in rc_model.py:',
         #       capped_gradients[1][0])
-        train_op = self.optimizer.apply_gradients(self.capped_gradients)
+        # train_op = self.optimizer.apply_gradients(self.capped_gradients)
 
         # save info
         self.saver = tf.train.Saver()
@@ -279,11 +279,10 @@ class RCModel(object):
         """
         total_num, total_loss = 0, 0
         # log_every_n_batch, n_batch_loss = 50, 0
-        log_every_n_batch, n_batch_loss = 1, 0
-        # print('len(train_batches) in _train_epoch in rc_model.py:',
-        #       len(list(train_batches)))
+        log_every_n_batch, n_batch_loss = 3, 0
+
         for bitx, batch in enumerate(train_batches, 1):
-            print('bitx in rc_model.py', bitx)
+            # print('bitx in rc_model.py', bitx)
             feed_dict = {self.p: batch['passage_token_ids'],
                          self.q: batch['question_token_ids'],
                          self.p_length: batch['passage_length'],
@@ -291,8 +290,6 @@ class RCModel(object):
                          self.start_label: batch['start_id'],
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
-            # print('feed_dict in rc_model.py:', feed_dict)
-            print('2.1 in _train_epoch in rc_model.py')
             # print('shape of self.start_probs:',
             #       self.start_probs.get_shape().as_list())
             # print(self.start_probs)
@@ -300,11 +297,11 @@ class RCModel(object):
             #       self.end_probs.get_shape().as_list())
             # print(self.end_probs)
             # Both are tensors
-            start = self.sess.run(self.start_probs, feed_dict)
-            end = self.sess.run(self.end_probs, feed_dict)
-            print('shape of start:', start.shape)
+            # start = self.sess.run(self.start_probs, feed_dict)
+            # end = self.sess.run(self.end_probs, feed_dict)
+            # print('shape of start:', start.shape)
             # print('start:', start)
-            print('shape of end:', end.shape)
+            # print('shape of end:', end.shape)
             # print('end:', end)
             # print('start == end:', start == end)
             # fw = self.sess.run(self.fw_outputs, feed_dict)
@@ -320,8 +317,8 @@ class RCModel(object):
             # print('type of fw_cell1', type(self.fw_cell1))
             # print('fw_cell==fw_cell1:', self.fw_cell == self.fw_cell1)
 
-            loss = self.sess.run(self.loss, feed_dict)
-            print('loss in _train_epoch in rc_model.py:', loss)
+            # loss = self.sess.run(self.loss, feed_dict)
+            # print('loss in _train_epoch in rc_model.py:', loss)
             # print('All parameters in rc_model.py', self.all_params)
 
             # gradients_none = [gradient for gradient in gradients
@@ -329,20 +326,20 @@ class RCModel(object):
             # print('gradients_none in _train_epoch in rc_model.py:',
             #       len(gradients_none))
 
-            results_g = self.sess.run(self.capped_gradients[1][0], feed_dict)
-            print('results_g in _train_epoch in rc_model.py:', results_g)
+            # results_g = self.sess.run(self.capped_gradients[1][0], feed_dict)
+            # print('results_g in _train_epoch in rc_model.py:', results_g)
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
-
-            print('2.2 in _train_epoch in rc_model.py')
 
             total_loss += loss * len(batch['raw_data'])
             total_num += len(batch['raw_data'])
             print('total_num in rc_model.py', total_num)
             n_batch_loss += loss
             if log_every_n_batch > 0 and bitx % log_every_n_batch == 0:
-                self.logger.info('Average loss from batch {} to {} is {}'.format(
-                    bitx - log_every_n_batch + 1, bitx, n_batch_loss / log_every_n_batch))
+                self.logger.info(
+                    'Average loss from batch {} to {} is {}'.format(
+                        bitx - log_every_n_batch + 1,
+                        bitx, n_batch_loss / log_every_n_batch))
                 n_batch_loss = 0
         return 1.0 * total_loss / total_num
 
@@ -363,14 +360,11 @@ class RCModel(object):
         pad_id = self.vocab.get_id(self.vocab.pad_token)
         max_bleu_4 = 0
         for epoch in range(1, epochs + 1):
-            print('1 in rc_model.py')
             self.logger.info('Training the model for epoch {}'.format(epoch))
             train_batches = data.gen_mini_batches('train', batch_size, pad_id,
                                                   shuffle=True)
-            print('2 train_batches in train() rc_model.py:', train_batches)
             train_loss = self._train_epoch(train_batches, dropout_keep_prob)
             self.logger.info('Average train loss for epoch {} is {}'.format(epoch, train_loss))
-            print('3 in rc_model.py')
 
             if evaluate:
                 self.logger.info('Evaluating the model after epoch {}'.format(epoch))
