@@ -12,11 +12,16 @@ import logging
 import pickle
 import sys
 from importlib import reload
-from dataset import BRCDataset
-from vocab import Vocab
-from rc_model import RCModel
-
 reload(sys)
+
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
+
+from tensorflow.dataset import BRCDataset
+from tensorflow.vocab import Vocab
+from tensorflow.rc_model import RCModel
+
 # 第二次或者多次导入sys的时候，这里强制要求导入更新后的sys模块，也就是再导入一次，sys模块中
 # 的变量有可能发生变化，比如rc_model.py中就修改了sys.path
 
@@ -24,9 +29,9 @@ reload(sys)
 # "TF_CPP_MIN_LOG_LEVEL"是控制tensorflow的环境变量，0输出所有信息
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
-
 # python run_python3.py --train --algo MLSTM --epochs 2 --batch_size 1
 # python run_python3.py --train --epochs 2 --batch_size 1
+
 
 def parse_args():
     """
