@@ -173,6 +173,7 @@ def train(args):
     """
     logger = logging.getLogger("brc")
     logger.info('Load data_set and vocab...')
+    print(os.path.join(args.vocab_dir, 'vocab.data'))
     with open(os.path.join(args.vocab_dir, 'vocab.data'), 'rb') as fin:
         vocab = pickle.load(fin)
     brc_data = BRCDataset(args.max_p_num, args.max_p_len, args.max_q_len,
