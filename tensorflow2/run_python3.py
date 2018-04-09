@@ -4,34 +4,39 @@
 @Author    : Deco [deco@cubee.com]
 @Created   : 3/19/18 10:23 AM
 @Desc      : This module prepares and runs the whole system.
-机器学习流程控制的经典代码
+机器学习流程控制的经典代码, python 3版本
 """
-import os
 import argparse
 import logging
+import os
 import pickle
 import sys
 from importlib import reload
+
 reload(sys)
+# 如果sys发生了变化，比如sys.path变化，通过reload可以更新设置
+# 第二次或者多次导入sys的时候，这里强制要求导入更新后的sys模块，也就是再导入一次，sys模块中
+# 的变量有可能发生变化，比如rc_model.py中就修改了sys.path
 
 base_dir = os.path.dirname(
     os.path.dirname(
         os.path.abspath(__file__)))
 if base_dir not in sys.path:
     sys.path.insert(0, base_dir)
+# 以base_dir为基准开始导入
 
 from tensorflow2.dataset import BRCDataset
 from tensorflow2.vocab import Vocab
 from tensorflow2.rc_model import RCModel
+# tensorflow与其他包冲突，所以改成tensorflow2
 
 os.chdir(os.path.join(base_dir, 'tensorflow2'))
-
-# 第二次或者多次导入sys的时候，这里强制要求导入更新后的sys模块，也就是再导入一次，sys模块中
-# 的变量有可能发生变化，比如rc_model.py中就修改了sys.path
+# 改变当前目录，因为后面要用到父目录，祖父目录
 
 # os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 # "TF_CPP_MIN_LOG_LEVEL"是控制tensorflow的环境变量，0输出所有信息
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+# 2压制warning，只输出error以上级别
 
 # python run_python3.py --train --algo MLSTM --epochs 2 --batch_size 1
 # python run_python3.py --train --epochs 2 --batch_size 1
@@ -263,6 +268,7 @@ def run():
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     if args.log_path:
         file_handler = logging.FileHandler(args.log_path)
+        # 会通过命令行传进来args.log_path，或者用默认值
         file_handler.setLevel(logging.INFO)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)

@@ -3,7 +3,7 @@
 @Module    : shortcuts.py
 @Author    : Deco [deco@cubee.com]
 @Created   : 4/9/18 4:18 PM
-@Desc      : 
+@Desc      : The shortcut of entrance of the project
 """
 import os
 import sys
