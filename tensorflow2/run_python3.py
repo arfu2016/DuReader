@@ -173,7 +173,6 @@ def train(args):
     """
     logger = logging.getLogger("brc")
     logger.info('Load data_set and vocab...')
-    print(os.path.join(args.vocab_dir, 'vocab.data'))
     with open(os.path.join(args.vocab_dir, 'vocab.data'), 'rb') as fin:
         vocab = pickle.load(fin)
     brc_data = BRCDataset(args.max_p_num, args.max_p_len, args.max_q_len,
@@ -185,12 +184,13 @@ def train(args):
     # 结果保存在brc_data中
     logger.info('Initialize the model...')
     rc_model = RCModel(vocab, args)
-    # try:
-    #     rc_model.restore(model_dir=args.model_dir,
-    #                      model_prefix=args.algo + '_' + str(2))
-    # except Exception as e:
-    #     print('Exception in train() in run_python3.py', e)
-    #     print('Initialize the model from beginning')
+    try:
+        rc_model.restore(model_dir=args.model_dir,
+                         model_prefix=args.algo + '_' + str(2))
+    except Exception as e:
+        print('Exception in train() in run_python3.py', e)
+        # str(e) or repr(e)
+        print('Initialize the model from beginning')
     logger.info('Training the model...')
     rc_model.train(brc_data, args.epochs, args.batch_size,
                    save_dir=args.model_dir,
