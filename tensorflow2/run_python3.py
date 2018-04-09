@@ -24,6 +24,8 @@ from tensorflow2.dataset import BRCDataset
 from tensorflow2.vocab import Vocab
 from tensorflow2.rc_model import RCModel
 
+os.chdir(os.path.join(base_dir, 'tensorflow2'))
+
 # 第二次或者多次导入sys的时候，这里强制要求导入更新后的sys模块，也就是再导入一次，sys模块中
 # 的变量有可能发生变化，比如rc_model.py中就修改了sys.path
 
