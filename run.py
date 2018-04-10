@@ -17,4 +17,4 @@ from tensorflow2.run_python3 import run
 if __name__ == '__main__':
     run()
 
-# python run.py --train --algo MLSTM --epochs 2 --batch_size 16
+# python run.py --train --algo MLSTM --epochs 2 --batch_size 16 --gpu "0,1"

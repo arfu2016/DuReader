@@ -28,7 +28,7 @@ import logging
 import json
 import numpy as np
 import tensorflow as tf
-import sys
+# import sys
 
 from tensorflow2.layers.basic_rnn import rnn
 from tensorflow2.layers.match_layer import MatchLSTMLayer
@@ -44,7 +44,7 @@ from utils import compute_bleu_rouge
 from utils import normalize
 
 
-class RCModel(object):
+class RCModel:
     """
     Implements the main reading comprehension model.
     """
@@ -68,6 +68,7 @@ class RCModel(object):
         self.max_q_len = args.max_q_len
         self.max_a_len = args.max_a_len
         # answer length
+        # 一个问题，可能有多个passage（多个document的最相关的段落），可能有多个回答
 
         # the vocab
         self.vocab = vocab
@@ -81,15 +82,17 @@ class RCModel(object):
         # create the session with log_device_placement configuration
         # option set to True.
         sess_config.gpu_options.allow_growth = True
+        # 并不是把gpu一开始就全部占据，而是逐步增加占掉的显存和计算力
         self.sess = tf.Session(config=sess_config)
 
         self._build_graph()
 
-        gradients = self.optimizer.compute_gradients(self.loss,
-                                                     self.all_params)
+        # gradients = self.optimizer.compute_gradients(self.loss,
+        #                                              self.all_params)
         # print('gradients in _train_epoch in rc_model.py:', gradients)
-        self.capped_gradients = [(tf.clip_by_value(grad, -1., 1.), var) for
-                                 grad, var in gradients if grad is not None]
+
+        # self.capped_gradients = [(tf.clip_by_value(grad, -1., 1.), var) for
+        #                          grad, var in gradients if grad is not None]
         # print('capped_gradients in _train_epoch in rc_model.py:',
         #       len(capped_gradients))
         # print('capped_gradients[1] in _train_epoch in rc_model.py:',
@@ -101,6 +104,7 @@ class RCModel(object):
 
         # initialize the model
         self.sess.run(tf.global_variables_initializer())
+        # 在其他的sess.run()之前，需要先initialize the model
 
     def _build_graph(self):
         """
@@ -115,10 +119,14 @@ class RCModel(object):
         self._decode()
         self._compute_loss()
         self._create_train_op()
-        self.logger.info('Time to build graph: {} s'.format(time.time() - start_t))
-        param_num = sum([np.prod(self.sess.run(tf.shape(v))) for v in self.all_params])
+        self.logger.info(
+            'Time to build graph: {} s'.format(time.time() - start_t))
+        param_num = sum([np.prod(self.sess.run(tf.shape(v)))
+                         for v in self.all_params])
+        # 列表中数字的连乘，先乘后加，计算参数个数
         # parameter number of the model
-        self.logger.info('There are {} parameters in the model'.format(param_num))
+        self.logger.info(
+            'There are {} parameters in the model'.format(param_num))
 
     def _setup_placeholders(self):
         """

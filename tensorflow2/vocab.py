@@ -22,7 +22,7 @@ This module implements the Vocab class for converting string to id and back
 import numpy as np
 
 
-class Vocab(object):
+class Vocab:
     """
     Implements a vocabulary to store the tokens in the data,
     with their corresponding embeddings.

@@ -53,6 +53,7 @@ def parse_args():
                              'prepare the vocabulary and embeddings')
     # args = parser.parse_args()
     # args.prepare is available
+    # when action='store_true' and --prepare exists, args.prepare is True
 
     parser.add_argument('--train', action='store_true',
                         help='train the model')
@@ -193,9 +194,9 @@ def train(args):
         rc_model.restore(model_dir=args.model_dir,
                          model_prefix=args.algo + '_' + str(2))
     except Exception as e:
-        print('Exception in train() in run_python3.py', e)
+        logger.info('Exception in train() in run_python3.py', e)
         # str(e) or repr(e)
-        print('Initialize the model from beginning')
+        logger.info('Initialize the model from beginning')
     logger.info('Training the model...')
     rc_model.train(brc_data, args.epochs, args.batch_size,
                    save_dir=args.model_dir,
@@ -281,7 +282,9 @@ def run():
     logger.info('Running with args : {}'.format(args))
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    # https://stackoverflow.com/questions/13781738/how-does-cuda-assign-device-ids-to-gpus?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
+    # 指定使用哪个或者哪些gpu，当使用两个以上时，显存似乎主要还是用第一个gpu的显存，另一个gpu只提供计算上的帮助，不提供显存上的帮助
 
     if args.prepare:
         prepare(args)

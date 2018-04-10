@@ -19,14 +19,14 @@ This module implements data process strategies.
 机器学习数据导入的经典代码
 """
 
-import os
+# import os
 import json
 import logging
 import numpy as np
 from collections import Counter
 
 
-class BRCDataset(object):
+class BRCDataset:
     """
     This module implements the APIs for loading and using baidu reading comprehension dataset
     """
