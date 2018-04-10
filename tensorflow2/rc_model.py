@@ -316,9 +316,11 @@ class RCModel:
         elif self.optim_type == 'rprop':
             self.optimizer = tf.train.RMSPropOptimizer(self.learning_rate)
         elif self.optim_type == 'sgd':
-            self.optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
+            self.optimizer = tf.train.GradientDescentOptimizer(
+                self.learning_rate)
         else:
-            raise NotImplementedError('Unsupported optimizer: {}'.format(self.optim_type))
+            raise NotImplementedError(
+                'Unsupported optimizer: {}'.format(self.optim_type))
         self.train_op = self.optimizer.minimize(self.loss)
         # 直接上minimize函数最省事
 
@@ -398,6 +400,7 @@ class RCModel:
                         bitx, n_batch_loss / log_every_n_batch))
                 n_batch_loss = 0
         return 1.0 * total_loss / total_num
+
     # 打印的是n_batch的平均loss，返回的是整个epoch的平均loss
 
     def train(self, data, epochs, batch_size, save_dir, save_prefix,
@@ -445,15 +448,19 @@ class RCModel:
             else:
                 self.save(save_dir, save_prefix + '_' + str(epoch))
 
-    def evaluate(self, eval_batches, result_dir=None, result_prefix=None, save_full_info=False):
+    def evaluate(self, eval_batches, result_dir=None, result_prefix=None,
+                 save_full_info=False):
         """
-        Evaluates the model performance on eval_batches and results are saved if specified
+        Evaluates the model performance on eval_batches and results are saved
+        if specified
         Args:
             eval_batches: iterable batch data
-            result_dir: directory to save predicted answers, answers will not be saved if None
+            result_dir: directory to save predicted answers,
+            answers will not be saved if None
             result_prefix: prefix of the file for saving predicted answers,
                            answers will not be saved if None
-            save_full_info: if True, the pred_answers will be added to raw sample and saved
+            save_full_info: if True, the pred_answers will be added to
+            raw sample and saved
         """
         pred_answers, ref_answers = [], []
         total_loss, total_num = 0, 0
@@ -465,43 +472,56 @@ class RCModel:
                          self.start_label: batch['start_id'],
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: 1.0}
-            start_probs, end_probs, loss = self.sess.run([self.start_probs,
-                                                          self.end_probs, self.loss], feed_dict)
+            # evaluate必然是没有dropout的
+            start_probs, end_probs, loss = self.sess.run(
+                [self.start_probs, self.end_probs, self.loss], feed_dict)
 
             total_loss += loss * len(batch['raw_data'])
             total_num += len(batch['raw_data'])
 
             padded_p_len = len(batch['passage_token_ids'][0])
-            for sample, start_prob, end_prob in zip(batch['raw_data'], start_probs, end_probs):
+            # self.p中最长的那个样本的长度？batch['passage_token_ids']应该是个
+            # 多维的np.ndarray才对，有可能是当list of list来处理，就是第一行,
+            # 也就是第一个样本
 
-                best_answer = self.find_best_answer(sample, start_prob, end_prob, padded_p_len)
+            for sample, start_prob, end_prob in zip(batch['raw_data'],
+                                                    start_probs, end_probs):
+
+                best_answer = self.find_best_answer(sample, start_prob,
+                                                    end_prob, padded_p_len)
                 # 在做evaluate和test的推测工作时，要这样利用start_prob和end_prob
                 if save_full_info:
                     sample['pred_answers'] = [best_answer]
                     pred_answers.append(sample)
                 else:
                     pred_answers.append({'question_id': sample['question_id'],
-                                         'question_type': sample['question_type'],
+                                         'question_type':
+                                             sample['question_type'],
                                          'answers': [best_answer],
                                          'entity_answers': [[]],
                                          'yesno_answers': []})
                 if 'answers' in sample:
                     ref_answers.append({'question_id': sample['question_id'],
-                                         'question_type': sample['question_type'],
-                                         'answers': sample['answers'],
-                                         'entity_answers': [[]],
-                                         'yesno_answers': []})
+                                        'question_type':
+                                            sample['question_type'],
+                                        'answers': sample['answers'],
+                                        'entity_answers': [[]],
+                                        'yesno_answers': []})
 
         if result_dir is not None and result_prefix is not None:
             result_file = os.path.join(result_dir, result_prefix + '.json')
-            with open(result_file, 'w') as fout:
+            with open(result_file, 'w', encoding='utf8') as fout:
                 for pred_answer in pred_answers:
-                    fout.write(json.dumps(pred_answer, encoding='utf8', ensure_ascii=False) + '\n')
+                    fout.write(json.dumps(pred_answer, encoding='utf8',
+                                          ensure_ascii=False) + '\n')
 
-            self.logger.info('Saving {} results to {}'.format(result_prefix, result_file))
+            self.logger.info(
+                'Saving {} results to {}'.format(result_prefix, result_file))
 
-        # this average loss is invalid on test set, since we don't have true start_id and end_id
+        # this average loss is invalid on test set,
+        # since we don't have true start_id and end_id
         ave_loss = 1.0 * total_loss / total_num
+
         # compute the bleu and rouge scores if reference answers is provided
         if len(ref_answers) > 0:
             pred_dict, ref_dict = {}, {}
@@ -517,19 +537,24 @@ class RCModel:
 
     def find_best_answer(self, sample, start_prob, end_prob, padded_p_len):
         """
-        Finds the best answer for a sample given start_prob and end_prob for each position.
-        This will call find_best_answer_for_passage because there are multiple passages in a sample
+        Finds the best answer for a sample given start_prob and end_prob for
+        each position.
+        This will call find_best_answer_for_passage because there are multiple
+        passages in a sample
         """
         best_p_idx, best_span, best_score = None, None, 0
         for p_idx, passage in enumerate(sample['passages']):
+            # 每篇document选了一段
             if p_idx >= self.max_p_num:
                 continue
             passage_len = min(self.max_p_len, len(passage['passage_tokens']))
+            # 如果passage长度超过self.max_p_len，在这儿会进行处理
             answer_span, score = self.find_best_answer_for_passage(
                 start_prob[p_idx * padded_p_len: (p_idx + 1) * padded_p_len],
                 end_prob[p_idx * padded_p_len: (p_idx + 1) * padded_p_len],
                 passage_len)
             if score > best_score:
+                # 来自不同文章的答案可以比较，因为能算出score
                 best_score = score
                 best_p_idx = p_idx
                 best_span = answer_span
@@ -537,30 +562,38 @@ class RCModel:
             best_answer = ''
         else:
             best_answer = ''.join(
-                sample['passages'][best_p_idx]['passage_tokens'][best_span[0]: best_span[1] + 1])
+                sample['passages'][best_p_idx]['passage_tokens'][best_span[0]:
+                best_span[1] + 1])
+            # best_span就是个2个元素的向量
         return best_answer
 
-    def find_best_answer_for_passage(self, start_probs, end_probs, passage_len=None):
+    def find_best_answer_for_passage(self, start_probs, end_probs,
+                                     passage_len=None):
         """
-        Finds the best answer with the maximum start_prob * end_prob from a single passage
+        Finds the best answer with the maximum start_prob * end_prob
+        from a single passage
         passage_len是start和end之间最长的长度？
         """
         if passage_len is None:
             passage_len = len(start_probs)
         else:
             passage_len = min(len(start_probs), passage_len)
+            # 又是取最小处理
         best_start, best_end, max_prob = -1, -1, 0
         for start_idx in range(passage_len):
             for ans_len in range(self.max_a_len):
                 end_idx = start_idx + ans_len
+                # end_idx必须在start_idx后面
                 if end_idx >= passage_len:
                     continue
+                    # start_idx与end_idx的间隔不能太长
                 prob = start_probs[start_idx] * end_probs[end_idx]
                 if prob > max_prob:
                     best_start = start_idx
                     best_end = end_idx
                     max_prob = prob
         return (best_start, best_end), max_prob
+    # 果然是只有两个元素的tuple
 
     def save(self, model_dir, model_prefix):
         """
@@ -573,7 +606,8 @@ class RCModel:
 
     def restore(self, model_dir, model_prefix):
         """
-        Restores the model into model_dir from model_prefix as the model indicator
+        Restores the model into model_dir from model_prefix as the model
+        indicator
         """
         self.saver.restore(self.sess, os.path.join(model_dir, model_prefix))
         self.logger.info(
