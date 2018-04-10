@@ -72,6 +72,7 @@ def parse_args():
                                 help='learning rate')
     train_settings.add_argument('--weight_decay', type=float, default=0,
                                 help='weight decay')
+    # 算loss的时候，要不要加l2 regularization，默认不加
     train_settings.add_argument('--dropout_keep_prob', type=float, default=1,
                                 help='dropout keep rate')
     train_settings.add_argument('--batch_size', type=int, default=32,
@@ -85,16 +86,22 @@ def parse_args():
                                 help='choose the algorithm to use')
     model_settings.add_argument('--embed_size', type=int, default=300,
                                 help='size of the embeddings')
+    # 可以调参，默认300
     model_settings.add_argument('--hidden_size', type=int, default=150,
                                 help='size of LSTM hidden units')
+    # 可以调参，默认150
     model_settings.add_argument('--max_p_num', type=int, default=5,
                                 help='max passage num in one sample')
+    # 最多5个document备选
     model_settings.add_argument('--max_p_len', type=int, default=500,
                                 help='max length of passage')
+    # passage长度最多500？似乎看到过2500
     model_settings.add_argument('--max_q_len', type=int, default=60,
                                 help='max length of question')
+    # 问题长度最长60
     model_settings.add_argument('--max_a_len', type=int, default=200,
                                 help='max length of answer')
+    # 回答长度最长200
 
     path_settings = parser.add_argument_group('path settings')
 

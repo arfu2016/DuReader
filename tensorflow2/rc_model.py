@@ -60,6 +60,7 @@ class RCModel:
         self.optim_type = args.optim
         self.learning_rate = args.learning_rate
         self.weight_decay = args.weight_decay
+        # 一种选择？
         self.use_dropout = args.dropout_keep_prob < 1
 
         # length limit
@@ -135,12 +136,14 @@ class RCModel:
         """
         self.p = tf.placeholder(tf.int32, [None, None])
         # 表示是二维数据，但具体维数可以不在这里给出，具体给数据时才确定
+        # 第一个维度一般是batch size
         self.q = tf.placeholder(tf.int32, [None, None])
         self.p_length = tf.placeholder(tf.int32, [None])
         # 一维数据
         self.q_length = tf.placeholder(tf.int32, [None])
         self.start_label = tf.placeholder(tf.int32, [None])
         self.end_label = tf.placeholder(tf.int32, [None])
+        # 从实际回答到文中标注出来，比如用正则表达式
         self.dropout_keep_prob = tf.placeholder(tf.float32)
         # 零维数据，也就是标量数据
 
@@ -150,6 +153,8 @@ class RCModel:
         只要词是一样的，embedding就是一样的
         """
         with tf.device('/cpu:0'), tf.variable_scope('word_embedding'):
+            # 此处指定使用cpu
+            # 第一次建立这个variable_scope, 而不是reuse
             self.word_embeddings = tf.get_variable(
                 'word_embeddings',
                 shape=(self.vocab.size(), self.vocab.embed_dim),
@@ -157,18 +162,26 @@ class RCModel:
                 # 把已经初始化好的embedding传过来
                 trainable=True
             )
+            # 生成variable，一般是可训练的
             self.p_emb = tf.nn.embedding_lookup(self.word_embeddings, self.p)
             # paragraph
             self.q_emb = tf.nn.embedding_lookup(self.word_embeddings, self.q)
             # question
+            # 把p和q中代表词的int转换为embedding
 
     def _encode(self):
         """
         Employs two Bi-LSTMs to encode passage and question separately
+        p和q都做了encode，之后又合并了，本质上不是encode，是预处理
         """
         with tf.variable_scope('passage_encoding'):
             self.sep_p_encodes, _ = rnn('bi-lstm', self.p_emb, self.p_length,
                                         self.hidden_size)
+            # self.p_emb是二维的，一个维度是batch size，另一个维度是多个sample中最长的
+            # p的长度；self.p_length是一维的，长度是batch size，具体内容是各个sample的
+            # p的长度；hidden_size是这个rnn中lstm的hidden unit数目，是可以调参的
+            # rnn的返回值既有output，也有hidden state，此处只记录output
+            # 其实是从一个矩阵变换到了另一个矩阵
         with tf.variable_scope('question_encoding'):
             self.sep_q_encodes, _ = rnn('bi-lstm', self.q_emb, self.q_length,
                                         self.hidden_size)
@@ -180,7 +193,8 @@ class RCModel:
 
     def _match(self):
         """
-        The core of RC model, get the question-aware passage encoding with either BIDAF or MLSTM
+        The core of RC model, get the question-aware passage
+        encoding with either BIDAF or MLSTM
         The attention process
         """
         if self.algo == 'MLSTM':
@@ -188,11 +202,19 @@ class RCModel:
         elif self.algo == 'BIDAF':
             match_layer = AttentionFlowMatchLayer(self.hidden_size)
         else:
-            raise NotImplementedError('The algorithm {} is not implemented.'.format(self.algo))
-        self.match_p_encodes, _ = match_layer.match(self.sep_p_encodes, self.sep_q_encodes,
-                                                    self.p_length, self.q_length)
+            raise NotImplementedError(
+                'The algorithm {} is not implemented.'.format(self.algo))
+        self.match_p_encodes, _ = match_layer.match(self.sep_p_encodes,
+                                                    self.sep_q_encodes,
+                                                    self.p_length,
+                                                    self.q_length)
+        # 所谓的attention的过程，就是把两个矩阵用神经网络的方式合并成一个矩阵
+        # 中间过程要拿到attention分布，这个分布与q有关，然后把这个分布施加在p上，得到新的
+        # 矩阵
+        # 只记录lstm的outputs，不记录hidden states
         if self.use_dropout:
-            self.match_p_encodes = tf.nn.dropout(self.match_p_encodes, self.dropout_keep_prob)
+            self.match_p_encodes = tf.nn.dropout(self.match_p_encodes,
+                                                 self.dropout_keep_prob)
 
     def _fuse(self):
         """
@@ -200,17 +222,24 @@ class RCModel:
         得到新的rnn
         """
         with tf.variable_scope('fusion'):
-            self.fuse_p_encodes, _ = rnn('bi-lstm', self.match_p_encodes, self.p_length,
+            self.fuse_p_encodes, _ = rnn('bi-lstm', self.match_p_encodes,
+                                         self.p_length,
                                          self.hidden_size, layer_num=1)
+            # attention之后，在用bi-lstm做一次矩阵变换，是真正的encode
+            # 此处lstm的layer_num是可调的
+            # 同样只记录outputs
             if self.use_dropout:
-                self.fuse_p_encodes = tf.nn.dropout(self.fuse_p_encodes, self.dropout_keep_prob)
+                self.fuse_p_encodes = tf.nn.dropout(self.fuse_p_encodes,
+                                                    self.dropout_keep_prob)
 
     def _decode(self):
         """
         Employs Pointer Network to get the the probs of each position
         to be the start or end of the predicted answer.
-        Note that we concat the fuse_p_encodes for the passages in the same document.
-        And since the encodes of queries in the same document is same, we select the first one.
+        Note that we concat the fuse_p_encodes for the passages in the same
+        document.
+        And since the encodes of queries in the same document is same,
+        we select the first one.
         """
         with tf.variable_scope('same_question_concat'):
             batch_size = tf.shape(self.start_label)[0]
@@ -218,24 +247,32 @@ class RCModel:
                 self.fuse_p_encodes,
                 [batch_size, -1, 2 * self.hidden_size]
             )
-            # 文章信息
+            # 维度调整，沿hidden_size方向延伸
+            # 文章信息，其实是把q合并在p上之后的信息
             no_dup_question_encodes = tf.reshape(
                 self.sep_q_encodes,
                 [batch_size, -1, tf.shape(self.sep_q_encodes)[1],
                  2 * self.hidden_size]
             )[0:, 0, 0:, 0:]
-            # 问题信息
+            # 问题信息，四个维度，其中第二个维度只取了一列数据
         decoder = PointerNetDecoder(self.hidden_size)
-        self.fw_outputs, self.fw_outputs2, self.bw_outputs = \
-            decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
+        # self.fw_outputs, self.fw_outputs2, self.bw_outputs = \
+        #     decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
         # self.fw_cell, self.bw_cell, self.fw_cell1 = \
         #     decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
-        self.start_probs, self.end_probs = decoder.decode(concat_passage_encodes,
-                                                          no_dup_question_encodes)
+        self.start_probs, self.end_probs = decoder.decode(
+            concat_passage_encodes, no_dup_question_encodes)
+        # decoder也是用的bi-lstm，no_dup_question_encodes作为hidden states输入，
+        # input是一个fake input，concat_passage_encodes是pointer net所用的矩阵
+
+        # 最终算出来的是passage中各个位置充当start的概率，和充当end的概率
+        # 具体怎么对待这两个概率，可以有多种规则，多种算法
+        # forword propagation到这里就完成了
 
     def _compute_loss(self):
         """
         The loss function
+        计算损失函数就为了之后的参数优化，本质上是为了back propagation
         此处损失函数用的还是cross entropy，既考虑start loss，也考虑end loss，把
         二者结合起来。在做拟合和推测时，都用到start prob和end prob，但处理方法是不同的
         还有一种处理方法，更类似加强学习，就是拟合的结果不和answer相比，而是把目标
@@ -247,19 +284,25 @@ class RCModel:
             negative log likelyhood loss
             """
             with tf.name_scope(scope, "log_loss"):
+                # 此处是name_scope
                 labels = tf.one_hot(labels, tf.shape(probs)[1], axis=1)
+                # labels是具体位置的序号，此处要one hot encoding
                 losses = - tf.reduce_sum(labels * tf.log(probs + epsilon), 1)
+                # cross entropy的公式, + epsilon是为了处理probs为0的情况
             return losses
 
         self.start_loss = sparse_nll_loss(probs=self.start_probs,
                                           labels=self.start_label)
         self.end_loss = sparse_nll_loss(probs=self.end_probs,
                                         labels=self.end_label)
+        # 要算两个cross entropy的loss，start和end各算一次
         self.all_params = tf.trainable_variables()
         self.loss = tf.reduce_mean(tf.add(self.start_loss, self.end_loss))
+        # 优化的目标函数：两个loss的加和求最小值
         if self.weight_decay > 0:
             with tf.variable_scope('l2_loss'):
                 l2_loss = tf.add_n([tf.nn.l2_loss(v) for v in self.all_params])
+                # 做l2 regularization，使得拟合的weight不至于太大
             self.loss += self.weight_decay * l2_loss
 
     def _create_train_op(self):
@@ -277,6 +320,7 @@ class RCModel:
         else:
             raise NotImplementedError('Unsupported optimizer: {}'.format(self.optim_type))
         self.train_op = self.optimizer.minimize(self.loss)
+        # 直接上minimize函数最省事
 
     def _train_epoch(self, train_batches, dropout_keep_prob):
         """
@@ -286,6 +330,7 @@ class RCModel:
             dropout_keep_prob: float value indicating dropout keep probability
         """
         total_num, total_loss = 0, 0
+        # 这一个epoch中总共训练了多少样本
         # log_every_n_batch, n_batch_loss = 50, 0
         log_every_n_batch, n_batch_loss = 3, 0
 
@@ -338,9 +383,12 @@ class RCModel:
             # print('results_g in _train_epoch in rc_model.py:', results_g)
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
+            # variable自动更新，返回的也是更新后的variable，这里就不记录了
 
             total_loss += loss * len(batch['raw_data'])
+            # loss是根据batch size平均后的结果，这里进行加总
             total_num += len(batch['raw_data'])
+            # 累加batch size，或者最后一批剩下的数目
             print('total_num in rc_model.py', total_num)
             n_batch_loss += loss
             if log_every_n_batch > 0 and bitx % log_every_n_batch == 0:
@@ -350,6 +398,7 @@ class RCModel:
                         bitx, n_batch_loss / log_every_n_batch))
                 n_batch_loss = 0
         return 1.0 * total_loss / total_num
+    # 打印的是n_batch的平均loss，返回的是整个epoch的平均loss
 
     def train(self, data, epochs, batch_size, save_dir, save_prefix,
               dropout_keep_prob=1.0, evaluate=False):
@@ -366,18 +415,23 @@ class RCModel:
               epoch
         """
         pad_id = self.vocab.get_id(self.vocab.pad_token)
+        # padding token的id
         max_bleu_4 = 0
         for epoch in range(1, epochs + 1):
             self.logger.info('Training the model for epoch {}'.format(epoch))
             train_batches = data.gen_mini_batches('train', batch_size, pad_id,
                                                   shuffle=True)
             train_loss = self._train_epoch(train_batches, dropout_keep_prob)
-            self.logger.info('Average train loss for epoch {} is {}'.format(epoch, train_loss))
+            self.logger.info(
+                'Average train loss for epoch {} is {}'.format(epoch,
+                                                               train_loss))
 
             if evaluate:
-                self.logger.info('Evaluating the model after epoch {}'.format(epoch))
+                self.logger.info(
+                    'Evaluating the model after epoch {}'.format(epoch))
                 if data.dev_set is not None:
-                    eval_batches = data.gen_mini_batches('dev', batch_size, pad_id, shuffle=False)
+                    eval_batches = data.gen_mini_batches(
+                        'dev', batch_size, pad_id, shuffle=False)
                     eval_loss, bleu_rouge = self.evaluate(eval_batches)
                     self.logger.info('Dev eval loss {}'.format(eval_loss))
                     self.logger.info('Dev eval result: {}'.format(bleu_rouge))
@@ -386,7 +440,8 @@ class RCModel:
                         self.save(save_dir, save_prefix)
                         max_bleu_4 = bleu_rouge['Bleu-4']
                 else:
-                    self.logger.warning('No dev set is loaded for evaluation in the dataset!')
+                    self.logger.warning(
+                        'No dev set is loaded for evaluation in the dataset!')
             else:
                 self.save(save_dir, save_prefix + '_' + str(epoch))
 
@@ -512,11 +567,15 @@ class RCModel:
         Saves the model into model_dir with model_prefix as the model indicator
         """
         self.saver.save(self.sess, os.path.join(model_dir, model_prefix))
-        self.logger.info('Model saved in {}, with prefix {}.'.format(model_dir, model_prefix))
+        self.logger.info(
+            'Model saved in {}, with prefix {}.'.format(model_dir,
+                                                        model_prefix))
 
     def restore(self, model_dir, model_prefix):
         """
         Restores the model into model_dir from model_prefix as the model indicator
         """
         self.saver.restore(self.sess, os.path.join(model_dir, model_prefix))
-        self.logger.info('Model restored from {}, with prefix {}'.format(model_dir, model_prefix))
+        self.logger.info(
+            'Model restored from {}, with prefix {}'.format(model_dir,
+                                                            model_prefix))
