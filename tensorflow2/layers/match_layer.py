@@ -79,14 +79,16 @@ class MatchLSTMLayer(object):
 class AttentionFlowMatchLayer(object):
     """
     Implements the Attention Flow layer,
-    which computes Context-to-question Attention and question-to-context Attention
+    which computes Context-to-question Attention and question-to-context
+    Attention
     """
     def __init__(self, hidden_size):
         self.hidden_size = hidden_size
 
     def match(self, passage_encodes, question_encodes, p_length, q_length):
         """
-        Match the passage_encodes with question_encodes using Attention Flow Match algorithm
+        Match the passage_encodes with question_encodes using Attention Flow
+        Match algorithm
         """
         with tf.variable_scope('bidaf'):
             #  自己用矩阵乘法和softmax来实现神经网络模型
@@ -98,8 +100,11 @@ class AttentionFlowMatchLayer(object):
                               -1)
             question2context_attn = tf.tile(tf.matmul(b, passage_encodes),
                                          [1, tf.shape(passage_encodes)[1], 1])
-            concat_outputs = tf.concat([passage_encodes, context2question_attn,
-                                        passage_encodes * context2question_attn,
-                                        passage_encodes * question2context_attn],
-                                       -1)
+            concat_outputs = tf.concat(
+                [passage_encodes, context2question_attn,
+                 passage_encodes * context2question_attn,
+                 passage_encodes * question2context_attn],
+                -1)
             return concat_outputs, None
+        # 输出None是为了和MLSTM接口的统一
+        # 整体上做的就是把passage和question两个矩阵合并成一个矩阵
