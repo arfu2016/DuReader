@@ -209,6 +209,10 @@ def train(args, restore=True):
             logger.exception('Exception in train() in run_python3.py. '
                              'Initialize the model from beginning')
             # str(e) or repr(e)
+        except Exception:
+            logger.exception('Unknown exception in train() in run_python3.py. '
+                             'Initialize the model from beginning')
+
     logger.info('Training the model...')
     rc_model.train(brc_data, args.epochs, args.batch_size,
                    save_dir=args.model_dir,

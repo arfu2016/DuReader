@@ -334,7 +334,7 @@ class RCModel:
         total_num, total_loss = 0, 0
         # 这一个epoch中总共训练了多少样本
         # log_every_n_batch, n_batch_loss = 50, 0
-        log_every_n_batch, n_batch_loss = 3, 0
+        log_every_n_batch, n_batch_loss = 30, 0
 
         for bitx, batch in enumerate(train_batches, 1):
             # print('bitx in rc_model.py', bitx)
