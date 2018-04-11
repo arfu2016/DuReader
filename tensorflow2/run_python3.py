@@ -180,7 +180,7 @@ def prepare(args):
     logger.info('Done with preparing!')
 
 
-def train(args):
+def train(args, restore=False):
     """
     trains the reading comprehension model
     """
@@ -197,13 +197,15 @@ def train(args):
     # 结果保存在brc_data中
     logger.info('Initialize the model...')
     rc_model = RCModel(vocab, args)
-    try:
-        rc_model.restore(model_dir=args.model_dir,
-                         model_prefix=args.algo + '_' + str(2))
-    except Exception as e:
-        logger.info('Exception in train() in run_python3.py', e)
-        # str(e) or repr(e)
-        logger.info('Initialize the model from beginning')
+    if restore:
+        try:
+            rc_model.restore(model_dir=args.model_dir,
+                             model_prefix=args.algo)
+            # todo: 上面这句可能需要改
+        except Exception as e:
+            logger.info('Exception in train() in run_python3.py', e)
+            # str(e) or repr(e)
+            logger.info('Initialize the model from beginning')
     logger.info('Training the model...')
     rc_model.train(brc_data, args.epochs, args.batch_size,
                    save_dir=args.model_dir,
@@ -229,7 +231,8 @@ def evaluate(args):
     logger.info('Restoring the model...')
     rc_model = RCModel(vocab, args)
     rc_model.restore(model_dir=args.model_dir,
-                     model_prefix=args.algo + '_' + str(2))
+                     model_prefix=args.algo)
+    # todo: 上面这句可能需要改，model_prefix=args.algo + '_' + str(2)
     logger.info('Evaluating the model on dev set...')
     dev_batches = brc_data.gen_mini_batches('dev', args.batch_size,
                                             pad_id=vocab.get_id(

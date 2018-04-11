@@ -441,6 +441,7 @@ class RCModel:
 
                     if bleu_rouge['Bleu-4'] > max_bleu_4:
                         self.save(save_dir, save_prefix)
+                        # 保存模型
                         max_bleu_4 = bleu_rouge['Bleu-4']
                 else:
                     self.logger.warning(
