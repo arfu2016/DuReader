@@ -512,7 +512,7 @@ class RCModel:
             result_file = os.path.join(result_dir, result_prefix + '.json')
             with open(result_file, 'w', encoding='utf8') as fout:
                 for pred_answer in pred_answers:
-                    fout.write(json.dumps(pred_answer, encoding='utf8',
+                    fout.write(json.dumps(pred_answer,
                                           ensure_ascii=False) + '\n')
 
             self.logger.info(
