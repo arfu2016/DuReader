@@ -17,8 +17,11 @@ cook_test(test, refs, n=4): Transform a test sentence as a string (together with
 '''
 
 import copy
-import sys, math, re
+import sys
+import math
+import re
 from collections import defaultdict
+
 
 def precook(s, n=4, out=False):
     """Takes a string as input and returns an object that can be given to
@@ -26,13 +29,15 @@ def precook(s, n=4, out=False):
     can take string arguments as well."""
     words = s.split()
     counts = defaultdict(int)
-    for k in range(1,n+1):
+    for k in range(1, n+1):
         for i in range(len(words)-k+1):
             ngram = tuple(words[i:i+k])
             counts[ngram] += 1
-    return (len(words), counts)
+    return len(words), counts
 
-def cook_refs(refs, eff=None, n=4): ## lhuang: oracle will call with "average"
+
+def cook_refs(refs, eff=None, n=4):
+    # lhuang: oracle will call with "average"
     '''Takes a list of reference sentences for a single segment
     and returns an object that encapsulates everything that BLEU
     needs to know about them.'''
@@ -43,7 +48,7 @@ def cook_refs(refs, eff=None, n=4): ## lhuang: oracle will call with "average"
         rl, counts = precook(ref, n)
         reflen.append(rl)
         for (ngram,count) in counts.items():
-            maxcounts[ngram] = max(maxcounts.get(ngram,0), count)
+            maxcounts[ngram] = max(maxcounts.get(ngram, 0), count)
 
     # Calculate effective reference sentence length.
     if eff == "shortest":
@@ -51,11 +56,12 @@ def cook_refs(refs, eff=None, n=4): ## lhuang: oracle will call with "average"
     elif eff == "average":
         reflen = float(sum(reflen))/len(reflen)
 
-    ## lhuang: N.B.: leave reflen computaiton to the very end!!
+    # lhuang: N.B.: leave reflen computaiton to the very end!!
     
-    ## lhuang: N.B.: in case of "closest", keep a list of reflens!! (bad design)
+    # lhuang: N.B.: in case of "closest", keep a list of reflens!! (bad design)
 
-    return (reflen, maxcounts)
+    return reflen, maxcounts
+
 
 def cook_test(test, reflen_refmaxcounts, eff=None, n=4):
     '''Takes a test sentence and returns an object that
@@ -72,7 +78,8 @@ def cook_test(test, reflen_refmaxcounts, eff=None, n=4):
     
     if eff == "closest":
         result["reflen"] = min((abs(l-testlen), l) for l in reflen)[1]
-    else: ## i.e., "average" or "shortest" or None
+    else:
+        # i.e., "average" or "shortest" or None
         result["reflen"] = reflen
 
     result["testlen"] = testlen
@@ -81,16 +88,19 @@ def cook_test(test, reflen_refmaxcounts, eff=None, n=4):
 
     result['correct'] = [0]*n
     for (ngram, count) in counts.items():
-        result["correct"][len(ngram)-1] += min(refmaxcounts.get(ngram,0), count)
+        result["correct"][len(ngram)-1] += min(refmaxcounts.get(ngram, 0),
+                                               count)
 
     return result
 
-class BleuScorer(object):
+
+class BleuScorer:
     """Bleu scorer.
     """
 
     __slots__ = "n", "crefs", "ctest", "_score", "_ratio", "_testlen", "_reflen", "special_reflen"
-    # special_reflen is used in oracle (proportional effective ref len for a node).
+    # special_reflen is used in oracle
+    # (proportional effective ref len for a node).
 
     def copy(self):
         ''' copy the refs.'''
@@ -110,17 +120,21 @@ class BleuScorer(object):
         self.special_reflen = special_reflen
 
     def cook_append(self, test, refs):
-        '''called by constructor and __iadd__ to avoid creating new instances.'''
+        '''called by constructor and __iadd__ to avoid
+        creating new instances.'''
         
         if refs is not None:
             self.crefs.append(cook_refs(refs))
             if test is not None:
                 cooked_test = cook_test(test, self.crefs[-1])
-                self.ctest.append(cooked_test) ## N.B.: -1
+                self.ctest.append(cooked_test)
+                # N.B.: -1
             else:
-                self.ctest.append(None) # lens of crefs and ctest have to match
+                self.ctest.append(None)
+                # lens of crefs and ctest have to match
 
-        self._score = None ## need to recompute
+        self._score = None
+        # need to recompute
 
     def ratio(self, option=None):
         self.compute_score(option=option)
@@ -128,7 +142,8 @@ class BleuScorer(object):
 
     def score_ratio(self, option=None):
         '''return (bleu, len_ratio) pair'''
-        return (self.fscore(option=option), self.ratio(option=option))
+        return (self.fscore(option=option),
+                self.ratio(option=option))
 
     def score_ratio_str(self, option=None):
         return "%.4f (%.2f)" % self.score_ratio(option)
@@ -165,13 +180,14 @@ class BleuScorer(object):
         '''add an instance (e.g., from another sentence).'''
 
         if type(other) is tuple:
-            ## avoid creating new BleuScorer instances
+            # avoid creating new BleuScorer instances
             self.cook_append(other[0], other[1])
         else:
             assert self.compatible(other), "incompatible BLEUs."
             self.ctest.extend(other.ctest)
             self.crefs.extend(other.crefs)
-            self._score = None ## need to recompute
+            self._score = None
+            # need to recompute
 
         return self        
 
@@ -201,7 +217,8 @@ class BleuScorer(object):
     def compute_score(self, option=None, verbose=0):
         n = self.n
         small = 1e-9
-        tiny = 1e-15 ## so that if guess is 0 still return 0
+        tiny = 1e-15
+        # so that if guess is 0 still return 0
         bleu_list = [[] for _ in range(n)]
 
         if self._score is not None:
@@ -219,7 +236,8 @@ class BleuScorer(object):
             testlen = comps['testlen']
             self._testlen += testlen
 
-            if self.special_reflen is None: ## need computation
+            if self.special_reflen is None:
+                # need computation
                 reflen = self._single_reflen(comps['reflen'], option, testlen)
             else:
                 reflen = self.special_reflen
@@ -236,7 +254,8 @@ class BleuScorer(object):
                 bleu *= (float(comps['correct'][k]) + tiny) \
                         /(float(comps['guess'][k]) + small) 
                 bleu_list[k].append(bleu ** (1./(k+1)))
-            ratio = (testlen + tiny) / (reflen + small) ## N.B.: avoid zero division
+            ratio = (testlen + tiny) / (reflen + small)
+            # N.B.: avoid zero division
             if ratio < 1:
                 for k in range(n):
                     bleu_list[k][-1] *= math.exp(1 - 1/ratio)
@@ -253,7 +272,8 @@ class BleuScorer(object):
             bleu *= float(totalcomps['correct'][k] + tiny) \
                     / (totalcomps['guess'][k] + small)
             bleus.append(bleu ** (1./(k+1)))
-        ratio = (self._testlen + tiny) / (self._reflen + small) ## N.B.: avoid zero division
+        ratio = (self._testlen + tiny) / (self._reflen + small)
+        # N.B.: avoid zero division
         if ratio < 1:
             for k in range(n):
                 bleus[k] *= math.exp(1 - 1/ratio)
