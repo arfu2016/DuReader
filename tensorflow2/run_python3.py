@@ -11,6 +11,7 @@ import logging
 import os
 import pickle
 import sys
+import tensorflow as tf
 from importlib import reload
 
 reload(sys)
@@ -202,10 +203,12 @@ def train(args, restore=True):
             rc_model.restore(model_dir=args.model_dir,
                              model_prefix=args.algo)
             # todo: 上面这句可能需要改
-        except Exception as e:
-            logger.info('Exception in train() in run_python3.py', e)
+        # except Exception as e:
+        except tf.errors.InvalidArgumentError:
+            # logger.info('Exception in train() in run_python3.py', e)
+            logger.exception('Exception in train() in run_python3.py. '
+                             'Initialize the model from beginning')
             # str(e) or repr(e)
-            logger.info('Initialize the model from beginning')
     logger.info('Training the model...')
     rc_model.train(brc_data, args.epochs, args.batch_size,
                    save_dir=args.model_dir,
