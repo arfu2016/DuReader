@@ -17,9 +17,9 @@ cook_test(test, refs, n=4): Transform a test sentence as a string (together with
 '''
 
 import copy
-import sys
+# import sys
 import math
-import re
+# import re
 from collections import defaultdict
 
 
@@ -140,13 +140,13 @@ class BleuScorer:
         self.compute_score(option=option)
         return self._ratio
 
-    def score_ratio(self, option=None):
-        '''return (bleu, len_ratio) pair'''
-        return (self.fscore(option=option),
-                self.ratio(option=option))
-
-    def score_ratio_str(self, option=None):
-        return "%.4f (%.2f)" % self.score_ratio(option)
+    # def score_ratio(self, option=None):
+    #     '''return (bleu, len_ratio) pair'''
+    #     return (self.fscore(option=option),
+    #             self.ratio(option=option))
+    #
+    # def score_ratio_str(self, option=None):
+    #     return "%.4f (%.2f)" % self.score_ratio(option)
 
     def reflen(self, option=None):
         self.compute_score(option=option)

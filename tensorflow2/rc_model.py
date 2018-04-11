@@ -404,7 +404,7 @@ class RCModel:
     # 打印的是n_batch的平均loss，返回的是整个epoch的平均loss
 
     def train(self, data, epochs, batch_size, save_dir, save_prefix,
-              dropout_keep_prob=1.0, evaluate=False):
+              dropout_keep_prob=1.0, evaluate=True):
         """
         Train the model with data
         Args:
@@ -529,8 +529,10 @@ class RCModel:
                 question_id = ref['question_id']
                 if len(ref['answers']) > 0:
                     pred_dict[question_id] = normalize(pred['answers'])
+                    # 利用utils包，normalize strings to space joined chars
                     ref_dict[question_id] = normalize(ref['answers'])
             bleu_rouge = compute_bleu_rouge(pred_dict, ref_dict)
+            # 利用utils包，calculate bleu and rouge metrics
         else:
             bleu_rouge = None
         return ave_loss, bleu_rouge

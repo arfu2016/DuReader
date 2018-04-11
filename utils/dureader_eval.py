@@ -543,7 +543,7 @@ def main(args):
         pred_result = read_file(args.pred_file, args.task)
         ref_result = read_file(args.ref_file, args.task, is_ref=True)
         sources = ['both', 'search', 'zhidao']
-        if args.task not in set(['main', 'all']):
+        if args.task not in {'main', 'all'}:
             sources = sources[:1]
         for source in sources:
             metrics[source] = get_metrics(
