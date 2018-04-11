@@ -180,7 +180,7 @@ def prepare(args):
     logger.info('Done with preparing!')
 
 
-def train(args, restore=False):
+def train(args, restore=True):
     """
     trains the reading comprehension model
     """
