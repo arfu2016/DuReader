@@ -296,7 +296,7 @@ def predict(args):
         answer_samples = random.sample(question_answer, 10)
         logger.info('Question and answer for testing:')
         for sample in answer_samples:
-            logger.info(sample[0], ':', sample[1])
+            logger.info('{}: {}'.format(sample[0], sample[1]))
 
 
 def run():
