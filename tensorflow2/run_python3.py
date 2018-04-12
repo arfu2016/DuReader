@@ -10,6 +10,8 @@ import argparse
 import logging
 import os
 import pickle
+import json
+import random
 import sys
 import tensorflow as tf
 from importlib import reload
@@ -280,6 +282,21 @@ def predict(args):
                       result_dir=args.result_dir,
                       result_prefix='test.predicted')
     # 同样使用evaluate函数
+
+    result_dir = args.result_dir
+    question_answer = list()
+
+    if result_dir is not None:
+        result_file = os.path.join(result_dir, 'test.predicted.json')
+        with open(result_file, 'r', encoding='utf8') as fin:
+            for line in fin:
+                answer_dict = json.loads(line.strip())
+                question_answer.append((answer_dict['question'],
+                                        answer_dict['answers']))
+        answer_samples = random.sample(question_answer, 10)
+        logger.info('Question and answer for testing:')
+        for sample in answer_samples:
+            logger.info(sample[0], ':', sample[1])
 
 
 def run():
