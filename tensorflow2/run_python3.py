@@ -285,6 +285,7 @@ def predict(args):
 
     result_dir = args.result_dir
     question_answer = list()
+    answer_string = ''
 
     if result_dir is not None:
         result_file = os.path.join(result_dir, 'test.predicted.json')
@@ -294,9 +295,9 @@ def predict(args):
                 question_answer.append((answer_dict['question'],
                                         answer_dict['answers']))
         answer_samples = random.sample(question_answer, 10)
-        logger.info('Question and answer for testing:')
         for sample in answer_samples:
-            logger.info('{}: {}'.format(sample[0], sample[1]))
+            answer_string += '{}: {} \n'.format(sample[0], sample[1])
+        logger.info('Question and answer for testing: \n', answer_string)
 
 
 def run():
