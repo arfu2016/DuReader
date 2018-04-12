@@ -498,6 +498,7 @@ class RCModel:
                     pred_answers.append({'question_id': sample['question_id'],
                                          'question_type':
                                              sample['question_type'],
+                                         'question': sample['question'],
                                          'answers': [best_answer],
                                          'entity_answers': [[]],
                                          'yesno_answers': []})
@@ -533,6 +534,7 @@ class RCModel:
                     # 利用utils包，normalize strings to space joined chars
                     ref_dict[question_id] = normalize(ref['answers'])
             bleu_rouge = compute_bleu_rouge(pred_dict, ref_dict)
+            # pred_dict是预测值，ref_dict是真实值
             # 利用utils包，calculate bleu and rouge metrics
         else:
             bleu_rouge = None

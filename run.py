@@ -21,10 +21,13 @@ if __name__ == '__main__':
 # --train_files '../data/preprocessed/trainset/search.train.json' \
 # --dev_files '../data/preprocessed/devset/search.dev.json'
 
-# python run.py --train --algo MLSTM --epochs 2 --batch_size 16 --gpu "0,1"
-# python run.py --evaluate --algo MLSTM --batch_size 16
+# python run.py --predict --algo MLSTM --batch_size 16 --gpu "0,1" \
+# --test_files '../data/demo/testset/search.test.json'
 
 # python run.py --prepare \
 # --train_files '../data/preprocessed/trainset/search.train.json' \
 # --dev_files '../data/preprocessed/devset/search.dev.json' \
 # --test_files '../data/demo/testset/search.test.json'
+
+# python run.py --train --algo MLSTM --epochs 2 --batch_size 16 --gpu "0,1"
+# python run.py --evaluate --algo MLSTM --batch_size 16
