@@ -210,7 +210,9 @@ class RCModel:
                                                     self.q_length)
         # 所谓的attention的过程，就是把两个矩阵用神经网络的方式合并成一个矩阵
         # 中间过程要拿到attention分布，这个分布与q有关，然后把这个分布施加在p上，得到新的
-        # 矩阵
+        # 矩阵; p后来要被pointer net来用，所以p是主要的，q是次要的，p和q是有关系的，
+        # 但这种关系如何建模，一般是采取attention的方式来建模，不管MLSM还是DIDAF，
+        # 用的都是这种方式，只不过细节不同
         # 只记录lstm的outputs，不记录hidden states
         if self.use_dropout:
             self.match_p_encodes = tf.nn.dropout(self.match_p_encodes,
@@ -225,9 +227,9 @@ class RCModel:
             self.fuse_p_encodes, _ = rnn('bi-lstm', self.match_p_encodes,
                                          self.p_length,
                                          self.hidden_size, layer_num=1)
-            # attention之后，在用bi-lstm做一次矩阵变换，是真正的encode
-            # 此处lstm的layer_num是可调的
-            # 同样只记录outputs
+            # attention之后，再用bi-lstm做一次矩阵变换，是真正的encode
+            # 此处lstm的layer_num是可调的（layer_num大于1的话，似乎代码有bug）
+            # 同样只记录outputs，作为pointer net选择的对象
             if self.use_dropout:
                 self.fuse_p_encodes = tf.nn.dropout(self.fuse_p_encodes,
                                                     self.dropout_keep_prob)
