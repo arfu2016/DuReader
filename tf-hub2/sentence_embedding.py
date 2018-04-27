@@ -8,6 +8,7 @@
 import tensorflow as tf
 import tensorflow_hub as hub
 import os
+import numpy as np
 
 if __name__ == '__main__':
     file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -32,3 +33,6 @@ if __name__ == '__main__':
 
     print(message_embedding)
     print(message_embedding.shape)
+    print(type(message_embedding))
+    print(np.linalg.norm(message_embedding[0, :]))
+    print(np.linalg.norm(message_embedding[1, :]))
