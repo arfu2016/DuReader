@@ -20,17 +20,16 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
 
 class SentenceTarget:
 
-    meaning2question = defaultdict(list)
-    question2meaning = dict()
-    meaning_embedding = defaultdict(float)
-    meaning_weight = defaultdict(int)
-
-    def __init__(self):
+    def __init__(self, original_data=None):
 
         self._set_logger()
         self._build_embed()
-        for st in self.question2meaning:
-            self._append_embedding(st)
+        self._load_original_data(original_data)
+        if len(self.question2meaning) == 0:
+            self.group_embedding = None
+        # else:
+        #     for st in self.question2meaning:
+        #         self._append_embedding(st)
 
     def _set_logger(self):
 
@@ -45,6 +44,20 @@ class SentenceTarget:
         console_handler.setFormatter(formatter)
 
         self.logger.addHandler(console_handler)
+
+    def _build_embed(self):
+        file_dir = os.path.dirname(os.path.abspath(__file__))
+        self.embed = hub.Module(os.path.join(file_dir,
+                                'data/universal-sentence-encoder'))
+
+    def _load_original_data(self, q2m=None):
+        self.meaning2question = defaultdict(list)
+        self.question2meaning = dict()
+        self.meaning_embedding = defaultdict(float)
+        self.meaning_weight = defaultdict(int)
+        if q2m is not None:
+            for question, meaning in q2m.items():
+                self.append_tpl_by_key(meaning, question)
 
     def append_tpl_by_key(self, meaning, st):
         if st in self.question2meaning:
@@ -63,7 +76,40 @@ class SentenceTarget:
             self.logger.warning(
                 '{} does not exist in the templates'.format(ref))
 
+    def _append_embedding(self, st, weight=1):
+        embedding = self.embed([st])
+        with tf.Session() as session:
+            session.run(
+                [tf.global_variables_initializer(), tf.tables_initializer()])
+            embedding_here = session.run(embedding)
+
+        self.logger.debug(type(embedding_here))
+        self.logger.debug(embedding_here.shape)
+        self.logger.debug(self.question2meaning)
+
+        # meaning = self.question2meaning.get(st, None)
+        meaning = self.question2meaning[st]
+        weight_before = self.meaning_weight[meaning]
+        self.meaning_weight[meaning] = weight_before + weight
+
+        embedding_before = self.meaning_embedding[meaning]
+        result = (weight_before*embedding_before +
+                  embedding_here*weight)/(weight_before + weight)
+        self.meaning_embedding[meaning] = result
+
+        temp_embedding = [(key, value) for key, value
+                          in self.meaning_embedding.items()]
+        self.meaning_list, value_embedding = zip(*temp_embedding)
+        components_embedding = [embedding.tolist()[0]
+                                for embedding in value_embedding]
+
+        self.group_embedding = np.array(components_embedding)
+
     def target_select(self, st):
+
+        if self.group_embedding is None:
+
+            return None
 
         def run_cal_similarity(sess):
             """Returns the similarity scores"""
@@ -92,65 +138,30 @@ class SentenceTarget:
             scores = run_cal_similarity(session)
         return scores
 
-    def _append_embedding(self, st, weight=1):
-        embedding = self.embed([st])
-        with tf.Session() as session:
-            session.run(
-                [tf.global_variables_initializer(), tf.tables_initializer()])
-            embedding_here = session.run(embedding)
-
-        self.logger.debug(type(embedding_here))
-        self.logger.debug(embedding_here.shape)
-        self.logger.debug(self.question2meaning)
-
-        meaning = self.question2meaning.get(st, None)
-        weight_before = self.meaning_weight[meaning]
-
-        self.logger.debug(weight_before)
-
-        embedding_before = self.meaning_embedding[meaning]
-
-        self.logger.debug(embedding_before)
-
-        result = (weight_before*embedding_before +
-                  embedding_here*weight)/(weight_before + weight)
-
-        self.logger.debug(result)
-
-        self.meaning_embedding[meaning] = result
-
-        temp_embedding = [(key, value) for key, value
-                          in self.meaning_embedding.items()]
-        self.meaning_list, value_embedding = zip(*temp_embedding)
-        components_embedding = [embedding.tolist()[0]
-                                for embedding in value_embedding]
-
-        self.logger.debug(components_embedding)
-
-        self.group_embedding = np.array(components_embedding)
-
-    def _build_embed(self):
-        file_dir = os.path.dirname(os.path.abspath(__file__))
-        self.embed = hub.Module(os.path.join(file_dir,
-                                'data/universal-sentence-encoder'))
-
 
 if __name__ == '__main__':
 
-    football = SentenceTarget()
+    football = SentenceTarget(
+        {'Could you tell me something about Jim': 'person_info'})
+
     football.append_tpl_by_key('person_info', 'Who is Jim')
     football.append_tpl_by_key('person_info', 'Jim')
-    football.append_tpl_by_key('team_info', 'Is Arsenal a good team')
+    football.append_tpl_by_key('team_info', "Team Arsenal's story")
     football.append_tpl_by_key('team_info', 'The history of Arsenal')
 
     football.logger.debug(football.group_embedding)
 
     arsenal_scores = football.target_select('Arsenal')
-    score_list = list(arsenal_scores / sum(arsenal_scores))
-    football.logger.info(
-        'Similarity scores: {}'.format(score_list))
-    football.logger.info(
-        'List of different meanings: {}'.format(football.meaning_list))
-    predict_meaning = football.meaning_list[np.argmax(arsenal_scores)]
-    football.logger.info(
-        'Predicted meaning: {}'.format(predict_meaning))
+
+    if arsenal_scores is not None:
+        score_list = list(arsenal_scores / sum(arsenal_scores))
+        football.logger.info(
+            'Similarity scores: {}'.format(score_list))
+        football.logger.info(
+            'List of different meanings: {}'.format(football.meaning_list))
+        predict_meaning = football.meaning_list[np.argmax(arsenal_scores)]
+        football.logger.info(
+            'Predicted meaning: {}'.format(predict_meaning))
+
+    else:
+        football.logger.warning('No references to classify the question.')
