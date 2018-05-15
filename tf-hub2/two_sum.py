@@ -31,26 +31,45 @@ return [0, 1].
 
 '''
 
+from bisect import bisect_left
+
+
+def index(a, x):
+    'binary search: Locate the leftmost value exactly equal to x'
+    i = bisect_left(a, x)
+    if i != len(a) and a[i] == x:
+        return i
+    raise ValueError
+
 
 class Solution:
     def twoSum(self, nums, target):
         """
+        time complexity O(nlogn), space complexity O(n)
         :type nums: List[int]
         :type target: int
         :rtype: List[int]
         """
         n = len(nums)
         A = [[i, num] for i, num in enumerate(nums)]
+        # space O(n)
         A = sorted(A, key=lambda x: x[1], reverse=True)
+        # sort a list of list
+        # space O(n)
         A_min = target - A[0][1]
         A_max = target - A[n - 1][1]
         A = filter(lambda x: A_min <= x[1] <= A_max, A)
+        # space O(n)
 
-        idxs = []
-        numbers = []
-        for idx, number in A:
-            idxs.append(idx)
-            numbers.append(number)
+        # idxs = []
+        # numbers = []
+        # for idx, number in A:
+        #     idxs.append(idx)
+        #     numbers.append(number)
+        idxs, numbers = zip(*A)
+        idxs = list(idxs)
+        numbers = list(numbers)
+        # space O(n)
 
         idx_left = None
         while 1:
@@ -58,7 +77,9 @@ class Solution:
             num_right = numbers.pop()
             num_left = target - num_right
             try:
-                idx_left = idxs[numbers.index(num_left)]
+                # idx_left = idxs[numbers.index(num_left)]
+                idx_left = idxs[index(numbers, num_left)]
+                # binary search
                 break
             except:
                 pass
@@ -76,9 +97,17 @@ class Solution:
 
 class Solution2:
     def twoSum(self, nums, target):
+        """time comlexity O(n), space complexity O(n)"""
         dic = {}
+        # extra space k*n, k is a large number
         for idx, num in enumerate(nums):
             if target - num in dic:
+                # hash search
                 return [dic[target - num], idx]
             else:
                 dic[num] = idx
+
+
+if __name__ == '__main__':
+    print(Solution().twoSum([2, 5, 3, 10], 5))
+    print(Solution2().twoSum([2, 5, 3, 10], 5))

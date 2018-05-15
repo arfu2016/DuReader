@@ -59,6 +59,12 @@ def load_data():
     _, top_number = zip(*top10)
     logger.info('There are {} top samples'.format(sum(top_number)))
 
+    top_dict = dict(top10)
+
+    samples_top10 = [(tpl, intent) for tpl, intent in ti if intent in top_dict]
+    print('Samples of top 10 intents:')
+    pprint.pprint(samples_top10)
+
 
 if __name__ == '__main__':
     load_data()
