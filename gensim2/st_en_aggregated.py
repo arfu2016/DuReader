@@ -9,6 +9,8 @@
 import subprocess
 from io import StringIO
 import os
+import re
+import string
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -69,17 +71,30 @@ def plot_similarity(labels, features, rotation):
     plt.show()
 
 
+def clean_sentence(st):
+    """
+    数据预处理
+    :param st: string
+    :return: string
+    """
+    in_tab = '[' + string.punctuation + '。，“”‘’（）：；？·—《》、' + ']'
+    out_tab = ''
+    clean = re.sub(in_tab, out_tab, st)
+    return clean
+
+
 def file_generate(sts):
     # seg_list = [' '.join(jieba.cut(st)) for st in sts]
-    seg_list = sts
+    seg_list = [clean_sentence(st) for st in sts]
     handle = StringIO('\n'.join(seg_list))
     return handle
 
 
 def model_load():
     file_dir = os.path.dirname(os.path.abspath(__file__))
-    fname = os.path.join(file_dir, 'data/wiki.zh.vec')
-    model0 = KeyedVectors.load_word2vec_format(fname, binary=False)
+    fname = os.path.join(file_dir,
+                         'data/GoogleNews-vectors-negative300.bin.gz')
+    model0 = KeyedVectors.load_word2vec_format(fname, binary=True)
     print('The model was loaded.')
     return model0
 
@@ -93,6 +108,7 @@ def cal_features(messages):
     print('messages:')
     for message in LineSentence(file_generate(messages)):
         print(message)
+        # LineSentence并没有把标点符号给去掉
         words_in_model = [word for word in message if word in vocab_dict]
         print(words_in_model)
         word_vectors = [model.wv[word].tolist() for word in words_in_model]
@@ -119,6 +135,7 @@ if __name__ == '__main__':
         # Weather
         "Will it snow tomorrow?",
         "Recently a lot of hurricanes have hit the US",
+        # a and of are stop words in google word2vec vocabulary
         "Global warming is real",
 
         # Food and health

@@ -17,7 +17,7 @@ from math import acos, pi
 import numpy as np
 
 
-class Vector(object):
+class Vector:
     def __init__(self, coordinates):
         self.coordinates = tuple(coordinates)
         self.dimension = len(coordinates)
@@ -77,16 +77,31 @@ class Vector(object):
         return np.linalg.norm(self.coordinates)
 
     def direction(self, *args):
-        """转化为向量所在方向的方向向量"""
+        """转化为向量所在方向的方向向量; 或者说，求单位向量"""
         self._zero_vec()
         return self.scalar_mult(1 / self.magnitude())
 
     def dot_product(self, v):
         """求向量的点乘，与矩阵的内积有关联"""
         self._eq_dim(v)
-        return reduce(lambda x, y: x + y, [a * b for a, b in \
-                                           zip(self.coordinates,
-                                               v.coordinates)])
+        return reduce(lambda x, y: x + y,
+                      [a * b for a, b in zip(self.coordinates, v.coordinates)])
+
+    def dot_product2(self, v):
+        self._eq_dim(v)
+        a = np.array(self.coordinates)
+        b = np.array(v.coordinates)
+        temp = np.dot(a, b)
+        return temp.tolist()
+
+    def multiply_elementwise(self, v):
+        self._eq_dim(v)
+        return Vector([a * b for a, b in zip(self.coordinates, v.coordinates)])
+
+    def multiply_elementwise2(self, v):
+        self._eq_dim(v)
+        temp = np.multiply(self.coordinates, v.coordinates)
+        return temp.tolist()
 
     def cross_product(self, v):
         def cross(a, b):
@@ -108,7 +123,8 @@ class Vector(object):
         return temp.tolist()
 
     def angle(self, v, degree=False):
-        """求两个向量的夹角大小，可以表征两个向量的相似度"""
+        """求两个向量的夹角大小，可以表征两个向量的相似度;
+        可以选择用实数表示还是用度数表示"""
         self._zero_vec()
         v._zero_vec()
         measurement = pi / 180 if degree else 1
@@ -149,6 +165,14 @@ if __name__ == '__main__':
     print(a.minus2(b))
     print(a.scalar_mult(2))
     print(a.scalar_mult2(2))
+    print(a.dot_product(b))
+    print(a.dot_product2(b))
+    print(a.multiply_elementwise(b))
+    print(a.multiply_elementwise2(b))
+    print(a.angle(b))
+    print(a.parallelism(b))
+    print(a.orthogonality(b))
+    print(a.projection(b))
 
     c = Vector([1, 2, 3])
     d = Vector([4, 5, 6])
