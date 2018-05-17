@@ -40,3 +40,34 @@ def clean_sentence3(st):
     out_tab = ''
     clean = re.sub(in_tab, out_tab, st)
     return clean
+
+
+def clean_sentence4(st):
+    """
+    数据预处理
+    :param st: string
+    :return: string
+    """
+    in_tab = string.punctuation + '。，“”‘’（）：；？·—《》、'
+    clean = ''.join([c for c in st if c not in in_tab])
+    # string search, time complexity m*O(n)
+    return clean
+
+
+def clean_sentence5(st):
+    """
+    数据预处理
+    :param st: string
+    :return: string
+    """
+    in_tab = string.punctuation + '。，“”‘’（）：；？·—《》、'
+    pt = set(p for p in in_tab)
+    clean = ''.join([c for c in st if c not in pt])
+    # hash search, time complexity m*O(1)
+    return clean
+
+
+if __name__ == "__main__":
+    print(string.punctuation)
+    print(clean_sentence4('The period will be removed.'))
+    print(clean_sentence5('The period will be removed.'))
