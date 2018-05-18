@@ -9,7 +9,9 @@ import os
 import tensorflow as tf
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "1"
-# 1压制info，只输出warn以上级别
+# 0输出info及以上级别
+# 1压制info，只输出warn及以上级别
+# 2压制warn，只输出error及以上级别
 
 # Reduce logging output.
 tf.logging.set_verbosity(tf.logging.ERROR)
