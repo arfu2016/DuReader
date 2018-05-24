@@ -3,7 +3,16 @@
 @Module    : pca.py
 @Author    : Deco [deco@cubee.com]
 @Created   : 5/24/18 1:16 PM
-@Desc      : 
+@Desc      :
+
+In Depth: Principal Component Analysis
+https://jakevdp.github.io/PythonDataScienceHandbook/05.09-principal-component-analysis.html
+
+PCA and proportion of variance explained:
+https://stats.stackexchange.com/questions/22569/pca-and-proportion-of-variance-explained
+
+Making sense of principal component analysis, eigenvectors & eigenvalues
+https://stats.stackexchange.com/questions/2691/making-sense-of-principal-component-analysis-eigenvectors-eigenvalues
 """
 
 '''
@@ -59,6 +68,21 @@ def pca(X, k):
 
 
 def sk_pca(X, k):
+    """
+    PCA can be implemented either by finding the eigenvectors of the covariance
+    matrix or by applying SVD to the centered data matrix. You don't do both
+    covariance and SVD. In practice, the SVD approach is preferable because
+    the computation of covariance matrix amplifies numerical issues associated
+    with poorly conditioned matrices.
+    sklearn uses the SVD method, and applies data centering (remove mean) in the
+    program
+
+    https://stackoverflow.com/questions/47476209/why-does-sklearn-decomposition-pca-fit-transformx-no-multiplication-by-x
+    https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/decomposition/pca.py#L432
+    :param X:
+    :param k:
+    :return:
+    """
     pca2 = decomposition.PCA(n_components=k, svd_solver='full')
 
     # X = X - X.mean(axis=0)
