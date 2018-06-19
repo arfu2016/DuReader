@@ -83,3 +83,13 @@ if __name__ == '__main__':
     embeddings = cal_features(sentences)
     # print('embeddings:')
     # pprint.pprint(embeddings)
+
+    first_ele = [emb[1] for emb in embeddings]
+    positive_ele = [ele for ele in first_ele if ele > 0]
+    print('min and max positive numbers:',
+          (min(positive_ele), max(positive_ele)))
+
+    plt.hist(first_ele, bins='auto')
+    # arguments are passed to np.histogram
+    plt.title("Histogram with 'auto' bins")
+    plt.show()
