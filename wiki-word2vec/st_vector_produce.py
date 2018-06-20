@@ -5,19 +5,16 @@
 @Created   : 6/19/18 4:28 PM
 @Desc      : 
 """
-import subprocess
 from io import StringIO
+# import pprint
 
+import elasticsearch
 import gensim
 import jieba
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
 from gensim.models.word2vec import LineSentence
-from matplotlib.font_manager import FontManager
-import pprint
-import elasticsearch
+from sklearn import decomposition
 
 es = elasticsearch.Elasticsearch([{'host': 'localhost', 'port': 9200}])
 
@@ -47,12 +44,9 @@ def cal_features(messages):
         print(words_in_model)
         word_vectors = [model.wv[word].tolist() for word in words_in_model]
         st_matrix = np.array(word_vectors)
-        # print(np.mean(st_matrix, axis=0).shape)
         st_vector = np.mean(st_matrix, axis=0).tolist()
-        # print('Length of sentence vector:', len(st_vector))
         st_vector = st_vector/np.linalg.norm(st_vector)
         st_vector_list.append(st_vector)
-
         print()
 
     return st_vector_list
@@ -76,6 +70,55 @@ def load_es():
     return st
 
 
+def sk_pca(X, k):
+    """
+    PCA can be implemented either by finding the eigenvectors of the covariance
+    matrix or by applying SVD to the centered data matrix. You don't do both
+    covariance and SVD. In practice, the SVD approach is preferable because
+    the computation of covariance matrix amplifies numerical issues associated
+    with poorly conditioned matrices.
+    sklearn uses the SVD method, and applies data centering (remove mean) in the
+    program
+
+    https://stackoverflow.com/questions/47476209/why-does-sklearn-decomposition-pca-fit-transformx-no-multiplication-by-x
+    https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/decomposition/pca.py#L432
+    :param X:
+    :param k:
+    :return:
+    """
+    pca2 = decomposition.PCA(n_components=k, svd_solver='full')
+    pca2.fit(X)
+    # adjust_components = pca2.components_ + pca2.mean_
+    X_reduced = pca2.transform(X)
+
+    return X_reduced
+
+
+def cal_scatter(func, X, k):
+    X_pca = func(X, k)
+    X_pca = X_pca.tolist()
+    xy = zip(*X_pca)
+    return xy
+
+
+def plot_hist(ele):
+    plt.hist(ele, bins='auto')
+    # arguments are passed to np.histogram
+    plt.title("Histogram with 'auto' bins")
+    plt.show()
+
+
+def plot_pca(vectors):
+    x0 = vectors
+    k0 = 2
+    x2y2 = cal_scatter(sk_pca, x0, k0)
+    x2, y2 = x2y2
+    fig = plt.figure(1)
+    ax = fig.add_subplot(1, 1, 1)
+    ax.scatter(x2, y2, color='blue')
+    plt.show()
+
+
 if __name__ == '__main__':
 
     sentences = load_es()
@@ -88,8 +131,6 @@ if __name__ == '__main__':
     positive_ele = [ele for ele in first_ele if ele > 0]
     print('min and max positive numbers:',
           (min(positive_ele), max(positive_ele)))
+    plot_hist(first_ele)
 
-    plt.hist(first_ele, bins='auto')
-    # arguments are passed to np.histogram
-    plt.title("Histogram with 'auto' bins")
-    plt.show()
+    plot_pca(embeddings)
