@@ -70,6 +70,52 @@ def load_es():
     return st
 
 
+def search_data0620():
+    p = es.search(index="dongqiudi",
+                  doc_type="news",
+                  body={"_source": ["title", "description"],
+                        "query": {"bool": {"filter": {
+                            "range": {"display_time": {
+                                "gte": '2018-06-20 00:00:00',
+                                "lt": '2018-06-21 00:00:00',
+                                }},
+                            }}},
+                        "size": 1000})
+    # pprint.pprint(p)
+    return p
+
+
+def load_es0620():
+    news_dict = search_data0620()
+    news_list = news_dict['hits']['hits']
+    st = [news['_source']['title'][0] for news in news_list]
+    # pprint.pprint(st)
+    return st
+
+
+def search_data0622():
+    p = es.search(index="dongqiudi",
+                  doc_type="news",
+                  body={"_source": ["title", "description"],
+                        "query": {"bool": {"filter": {
+                            "range": {"display_time": {
+                                "gte": '2018-06-22 00:00:00',
+                                "lt": '2018-06-23 00:00:00',
+                                }},
+                            }}},
+                        "size": 1000})
+    # pprint.pprint(p)
+    return p
+
+
+def load_es0622():
+    news_dict = search_data0622()
+    news_list = news_dict['hits']['hits']
+    st = [news['_source']['title'][0] for news in news_list]
+    # pprint.pprint(st)
+    return st
+
+
 def sk_pca(X, k):
     """
     PCA can be implemented either by finding the eigenvectors of the covariance
