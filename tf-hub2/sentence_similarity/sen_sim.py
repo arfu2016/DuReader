@@ -3,29 +3,31 @@
 @Module    : sen_sim.py
 @Author    : Deco [deco@cubee.com]
 @Created   : 7/2/18 10:37 AM
-@Desc      : 
+@Desc      : 给出一组句子，找到其中和一个另给的句子最相似的句子
 """
+import os
+import time
+from multiprocessing import Pool
+from threading import RLock
+
+import numpy as np
 import tensorflow as tf
 import tensorflow_hub as hub
-import os
-import numpy as np
 from cachetools import cached, TTLCache
-import time
-from threading import RLock
-from multiprocessing import Pool
-
-# embed = hub.Module("https://tfhub.dev/google/"
-#                    "universal-sentence-encoder/1")
 
 file_dir = os.path.dirname(os.path.dirname(__file__))
 embed = hub.Module(os.path.join(file_dir,
                                 'data/universal-sentence-encoder'))
+# embed = hub.Module("https://tfhub.dev/google/"
+#                    "universal-sentence-encoder/1")
 
 cache = TTLCache(maxsize=100, ttl=300)
 # If no expired items are there to remove, the least recently used items will
 # be discarded first to make space when necessary.
 
 lock = RLock()
+
+# 1. 把句子转换为向量
 
 
 @cached(cache)
@@ -37,7 +39,6 @@ def _sentence_embedding(sentences: tuple) -> np.ndarray:
             [tf.global_variables_initializer(), tf.tables_initializer()])
         sen_embedding = session.run(embedding)
 
-    # time.sleep(0.1)
     return sen_embedding
 
 
@@ -45,16 +46,10 @@ def _produce_sentence_embedding():
     training_sentences = ("The quick brown fox jumps over the lazy dog.",
                           "Who is Messy")
     training_embeddings = _sentence_embedding(training_sentences)
-    # print('type of training_embeddings:')
-    # print(type(training_embeddings))
 
     test_sentence = ('Can you tell me something about Messy',)
     test_embedding = _sentence_embedding(test_sentence)
 
-    # print('Embeddings of training sentences:')
-    # print(training_embeddings)
-    # print('Embeddings of test sentence:')
-    # print(test_embedding)
     return training_embeddings, test_embedding
 
 
@@ -85,6 +80,8 @@ def test_cache():
     print('time with cache:', time.perf_counter() - start)
 
 
+# 2. 给定两个句向量，计算向量相似度
+
 def _vector_similarity(encode1: list, encode2: list) -> float:
 
     sim_score = np.sum(np.multiply(encode1, encode2))
@@ -92,6 +89,8 @@ def _vector_similarity(encode1: list, encode2: list) -> float:
 
     return sim_score
 
+
+# 3. 给定一个向量和一组向量，计算前者和后者各个向量的相似度
 
 class VectorSimilarity:
     def __init__(self, test_vector):
@@ -126,6 +125,8 @@ def test_similarity_scores():
     print('Similarity scores:')
     print(sim_scores)
 
+
+# 4. 给定一个句子和一组句子，找出后者各个句子中和前者最为相似的句子
 
 def most_similar(training_sentences: tuple, test_sentence: tuple) -> str:
     training_embeddings = _sentence_embedding(training_sentences)
