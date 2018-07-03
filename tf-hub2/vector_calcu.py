@@ -92,6 +92,9 @@ class Vector:
         a = np.array(self.coordinates)
         b = np.array(v.coordinates)
         temp = np.dot(a, b)
+        print('temp in dot_product2:', temp)
+        print('type of temp:', type(temp))
+        print('type of temp.tolist():', type(temp.tolist()))
         return temp.tolist()
 
     def multiply_elementwise(self, v):

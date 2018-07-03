@@ -14,6 +14,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_hub as hub
 from cachetools import cached, TTLCache
+from functools import reduce
 
 file_dir = os.path.dirname(os.path.dirname(__file__))
 embed = hub.Module(os.path.join(file_dir,
@@ -28,6 +29,9 @@ cache = TTLCache(maxsize=100, ttl=300)
 lock = RLock()
 
 # 1. 把句子转换为向量
+# 某个函数值如果从来不变，可以用cache，也可以作为module attribute或者class attribute保存
+# 某个函数值固定时间更新（比如每天更新一次），可以用cache
+# 某个函数值每次都变，不要用cache，每次都直接调用函数
 
 
 @cached(cache)
@@ -83,15 +87,51 @@ def test_cache():
 
 # 2. 给定两个句向量，计算向量相似度
 
+
+def multiplication_two_number(tuple_two_numbers):
+    return tuple_two_numbers[0]*tuple_two_numbers[1]
+
+
+def _multiplication(encode1: list, encode2: list):
+    for x, y in zip(encode1, encode2):
+        yield x*y
+    # p = Pool(2)
+    # res = p.imap(multiplication_two_number, zip(encode1, encode2))
+    # # res = p.imap(lambda x, y: x*y, zip(encode1, encode2))
+    # p.close()
+    # p.join()
+    # return res
+
+
+def test_multiplication():
+    print()
+    print('Test test_multiplication()')
+    print('Result of _multiplication:')
+    print(_multiplication([0, 1], [1, 2]))
+
+
+def add(x, y):
+    return x+y
+
+
 def _vector_similarity(encode1: list, encode2: list) -> float:
     """assume the length of encode1 and encode2 are n, time complexity is
     O(n), space complexity is O(n)
     """
-
-    sim_score = np.sum(np.multiply(encode1, encode2))
+    sim_score = reduce(add, _multiplication(encode1, encode2))
+    # sim_score = sum(_multiplication(encode1, encode2))
+    # sim_score = sum([x*y for x, y in zip(encode1, encode2)])
+    # sim_score = np.sum(np.multiply(encode1, encode2))
     # realization of dot product of two vectors
 
     return sim_score
+
+
+def test_vector_similarity():
+    print()
+    print('Test test_vector_similarity()')
+    print('Result of _vector_similarity:')
+    print(_vector_similarity([0, 1], [1, 2]))
 
 
 # 3. 给定一个向量和一组向量，计算前者和后者各个向量的相似度
@@ -119,7 +159,12 @@ def _similarity_scores(training_vectors: np.ndarray,
     test_vector = test_vector[0]
 
     with Pool(2) as p:
-        sim_scores = p.map(VectorSimilarity(test_vector), training_vectors)
+        sim_scores = p.map(VectorSimilarity(test_vector),
+                           training_vectors)
+
+        # sim_scores = p.map_async(VectorSimilarity(test_vector),
+        #                          training_vectors)
+
         # sim_scores = p.map(lambda x: _vector_similarity(x, test_vector),
         #                    training_vectors)
 
@@ -134,6 +179,8 @@ def test_similarity_scores():
     print('Test test_similarity_scores()')
     training_embeddings, test_embedding = _produce_sentence_embedding()
     sim_scores = _similarity_scores(training_embeddings, test_embedding)
+    print('type of similarity scores:')
+    print(type(sim_scores))
     print('Similarity scores:')
     print(sim_scores)
 
@@ -169,6 +216,9 @@ def test_most_similar():
 
 
 if __name__ == '__main__':
+    test_multiplication()
+    test_vector_similarity()
+
     test_sentence_embedding()
     test_cache()
     test_similarity_scores()
