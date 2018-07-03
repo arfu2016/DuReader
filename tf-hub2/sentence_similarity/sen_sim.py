@@ -37,6 +37,7 @@ def _sentence_embedding(sentences: tuple) -> np.ndarray:
     with tf.Session() as session:
         session.run(
             [tf.global_variables_initializer(), tf.tables_initializer()])
+        # session.run([tf.global_variables_initializer()])
         sen_embedding = session.run(embedding)
 
     return sen_embedding
@@ -83,6 +84,9 @@ def test_cache():
 # 2. 给定两个句向量，计算向量相似度
 
 def _vector_similarity(encode1: list, encode2: list) -> float:
+    """assume the length of encode1 and encode2 are n, time complexity is
+    O(n), space complexity is O(n)
+    """
 
     sim_score = np.sum(np.multiply(encode1, encode2))
     # realization of dot product of two vectors
@@ -93,6 +97,9 @@ def _vector_similarity(encode1: list, encode2: list) -> float:
 # 3. 给定一个向量和一组向量，计算前者和后者各个向量的相似度
 
 class VectorSimilarity:
+    """Because in multiprocessing package, lambda function can not be pickled.
+    This class acts as a helper class to make it pickleable.
+    """
     def __init__(self, test_vector):
         self.test_vector = test_vector
 
@@ -102,18 +109,23 @@ class VectorSimilarity:
 
 def _similarity_scores(training_vectors: np.ndarray,
                        test_vector: np.ndarray) -> list:
+    """Assume for training vectors, the number of vectors is m, and the
+    length of each vector is n, then time complexity is O(mn). But in numpy,
+    this could be optimized.
+    """
 
     training_vectors = training_vectors.tolist()
     test_vector = test_vector.tolist()
     test_vector = test_vector[0]
 
+    with Pool(2) as p:
+        sim_scores = p.map(VectorSimilarity(test_vector), training_vectors)
+        # sim_scores = p.map(lambda x: _vector_similarity(x, test_vector),
+        #                    training_vectors)
+
     # sim_scores = [_vector_similarity(training_vector, test_vector)
     #               for training_vector in training_vectors]
 
-    with Pool(2) as p:
-        # sim_scores = p.map(lambda x: _vector_similarity(x, test_vector),
-        #                    training_vectors)
-        sim_scores = p.map(VectorSimilarity(test_vector), training_vectors)
     return sim_scores
 
 
@@ -129,14 +141,21 @@ def test_similarity_scores():
 # 4. 给定一个句子和一组句子，找出后者各个句子中和前者最为相似的句子
 
 def most_similar(training_sentences: tuple, test_sentence: tuple) -> str:
+    start = time.perf_counter()
     training_embeddings = _sentence_embedding(training_sentences)
+    print('time of calculating training_embeddings:',
+          time.perf_counter() - start)
+    start = time.perf_counter()
     test_embedding = _sentence_embedding(test_sentence)
+    print('time of calculating test_embedding:',
+          time.perf_counter() - start)
     sim_scores = _similarity_scores(training_embeddings, test_embedding)
     idx = np.argmax(sim_scores)
     return training_sentences[idx]
 
 
 def test_most_similar():
+    start = time.perf_counter()
     print()
     print('Test test_most_similar()')
     training_sentences = ("The quick brown fox jumps over the lazy dog.",
@@ -146,6 +165,7 @@ def test_most_similar():
     print("Most similar sentence of "
           "'Can you tell me something about Cristiano Ronaldo':")
     print(top_sentence)
+    print('time of test_most_similar():', time.perf_counter() - start)
 
 
 if __name__ == '__main__':
