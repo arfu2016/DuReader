@@ -12,6 +12,7 @@ import numpy as np
 from cachetools import cached, TTLCache
 import time
 from threading import RLock
+from multiprocessing import Pool
 
 # embed = hub.Module("https://tfhub.dev/google/"
 #                    "universal-sentence-encoder/1")
@@ -92,16 +93,28 @@ def _vector_similarity(encode1: list, encode2: list) -> float:
     return sim_score
 
 
-def similarity_scores(training_vectors: np.ndarray,
-                      test_vector: np.ndarray) -> list:
+class VectorSimilarity:
+    def __init__(self, test_vector):
+        self.test_vector = test_vector
+
+    def __call__(self, training_vector):
+        return _vector_similarity(training_vector, self.test_vector)
+
+
+def _similarity_scores(training_vectors: np.ndarray,
+                       test_vector: np.ndarray) -> list:
 
     training_vectors = training_vectors.tolist()
     test_vector = test_vector.tolist()
     test_vector = test_vector[0]
 
-    sim_scores = [_vector_similarity(training_vector, test_vector)
-                  for training_vector in training_vectors]
+    # sim_scores = [_vector_similarity(training_vector, test_vector)
+    #               for training_vector in training_vectors]
 
+    with Pool(2) as p:
+        # sim_scores = p.map(lambda x: _vector_similarity(x, test_vector),
+        #                    training_vectors)
+        sim_scores = p.map(VectorSimilarity(test_vector), training_vectors)
     return sim_scores
 
 
@@ -109,16 +122,33 @@ def test_similarity_scores():
     print()
     print('Test test_similarity_scores()')
     training_embeddings, test_embedding = _produce_sentence_embedding()
-    sim_scores = similarity_scores(training_embeddings, test_embedding)
+    sim_scores = _similarity_scores(training_embeddings, test_embedding)
     print('Similarity scores:')
     print(sim_scores)
 
 
-def most_similar(training_sentences: list, test_sentence: list) -> str:
-    pass
+def most_similar(training_sentences: tuple, test_sentence: tuple) -> str:
+    training_embeddings = _sentence_embedding(training_sentences)
+    test_embedding = _sentence_embedding(test_sentence)
+    sim_scores = _similarity_scores(training_embeddings, test_embedding)
+    idx = np.argmax(sim_scores)
+    return training_sentences[idx]
+
+
+def test_most_similar():
+    print()
+    print('Test test_most_similar()')
+    training_sentences = ("The quick brown fox jumps over the lazy dog.",
+                          "Who is Messy")
+    test_sentence = ('Can you tell me something about Cristiano Ronaldo',)
+    top_sentence = most_similar(training_sentences, test_sentence)
+    print("Most similar sentence of "
+          "'Can you tell me something about Cristiano Ronaldo':")
+    print(top_sentence)
 
 
 if __name__ == '__main__':
     test_sentence_embedding()
     test_cache()
     test_similarity_scores()
+    test_most_similar()
