@@ -7,6 +7,7 @@
 """
 import os
 import time
+from functools import reduce
 from multiprocessing import Pool
 from threading import RLock
 
@@ -14,7 +15,6 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_hub as hub
 from cachetools import cached, TTLCache
-from functools import reduce
 
 file_dir = os.path.dirname(os.path.dirname(__file__))
 embed = hub.Module(os.path.join(file_dir,
@@ -28,7 +28,8 @@ cache = TTLCache(maxsize=100, ttl=300)
 
 lock = RLock()
 
-# 1. 把句子转换为向量
+# 把句子转换为向量
+
 # 某个函数值如果从来不变，可以用cache，也可以作为module attribute或者class attribute保存
 # 某个函数值固定时间更新（比如每天更新一次），可以用cache
 # 某个函数值每次都变，不要用cache，每次都直接调用函数
@@ -74,9 +75,9 @@ def test_cache():
     print('Test test_cache()')
     with lock:
         cache.clear()
+    # to test the effect of cache
     # synchronization, 使用lock主要为了应对多线程情况
     # [clear the cache](http://cachetools.readthedocs.io/en/latest/)
-    # 多进程实现的话一般是异步实现？
     start = time.perf_counter()
     _produce_sentence_embedding()
     print('time without cache:', time.perf_counter()-start)
@@ -85,7 +86,7 @@ def test_cache():
     print('time with cache:', time.perf_counter() - start)
 
 
-# 2. 给定两个句向量，计算向量相似度
+# 给定两个句向量，计算向量相似度
 
 
 def multiplication_two_number(tuple_two_numbers):
@@ -134,7 +135,7 @@ def test_vector_similarity():
     print(_vector_similarity([0, 1], [1, 2]))
 
 
-# 3. 给定一个向量和一组向量，计算前者和后者各个向量的相似度
+# 给定一个向量和一组向量，计算前者和后者各个向量的相似度
 
 class VectorSimilarity:
     """Because in multiprocessing package, lambda function can not be pickled.
@@ -164,6 +165,7 @@ def _similarity_scores(training_vectors: np.ndarray,
 
         # sim_scores = p.map_async(VectorSimilarity(test_vector),
         #                          training_vectors)
+        # map的异步调用，返回的iterator中没有顺序，类似一个集合
 
         # sim_scores = p.map(lambda x: _vector_similarity(x, test_vector),
         #                    training_vectors)
@@ -185,7 +187,7 @@ def test_similarity_scores():
     print(sim_scores)
 
 
-# 4. 给定一个句子和一组句子，找出后者各个句子中和前者最为相似的句子
+# 给定一个句子和一组句子，找出后者各个句子中和前者最为相似的句子
 
 def most_similar(training_sentences: tuple, test_sentence: tuple) -> str:
     start = time.perf_counter()
