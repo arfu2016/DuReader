@@ -35,13 +35,13 @@ lock = RLock()
 # 某个函数值每次都变，不要用cache，每次都直接调用函数
 
 session = tf.Session()
-session.run(
-            [tf.global_variables_initializer(), tf.tables_initializer()])
+session.run([tf.global_variables_initializer(), tf.tables_initializer()])
 
 
 @cached(cache)
 def _sentence_embedding(sentences: tuple) -> np.ndarray:
     embedding = tf.nn.l2_normalize(embed(sentences))
+    # embedding = embed(sentences)
     sen_embedding = session.run(embedding)
 
     return sen_embedding
