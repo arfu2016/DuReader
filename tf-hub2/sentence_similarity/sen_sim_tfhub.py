@@ -59,8 +59,9 @@ class VectorSimilarity:
 def _similarity_scores(training_vectors: np.ndarray,
                        test_vector: np.ndarray) -> list:
     """Assume for training vectors, the number of vectors is m, and the
-    length of each vector is n, then time complexity is O(mn). But in numpy,
-    this could be optimized.
+    length of each vector is n, then time complexity is O(mn) for single
+    thread. But in numpy, this could be optimized. For multiprocessing, time
+    is also reduced.
     """
 
     training_vectors = training_vectors.tolist()
@@ -97,7 +98,7 @@ def t_most_similar():
     print("Most similar sentence of "
           "'Can you tell me something about Cristiano Ronaldo':")
     print(top_sentence)
-    print('time of test_most_similar():', time.perf_counter() - start)
+    print('time of t_most_similar():', time.perf_counter() - start)
 
 
 def t2_most_similar():
@@ -111,7 +112,7 @@ def t2_most_similar():
     print("Most similar sentence of "
           "'Something about football':")
     print(top_sentence)
-    print('time of test_most_similar():', time.perf_counter() - start)
+    print('time of t2_most_similar():', time.perf_counter() - start)
 
 
 if __name__ == '__main__':
