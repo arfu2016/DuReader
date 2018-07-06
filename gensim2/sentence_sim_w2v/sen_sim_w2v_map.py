@@ -1,33 +1,96 @@
 """
 @Project   : DuReader
-@Module    : sen_sim_tfhub.py
+@Module    : sen_sim_w2v_map.py
 @Author    : Deco [deco@cubee.com]
-@Created   : 7/5/18 3:05 PM
-@Desc      : 给出一组句子，找到其中和一个另给的句子最相似的句子
+@Created   : 7/6/18 3:12 PM
+@Desc      : 
 """
 import os
 import time
 from multiprocessing import Pool
+import logging
+import string
 
 import numpy as np
-import tensorflow as tf
-import tensorflow_hub as hub
+# import tensorflow as tf
+# import tensorflow_hub as hub
 from cachetools import cached, TTLCache
+from nltk.tokenize import word_tokenize
+from gensim.models import KeyedVectors
 
 file_dir = os.path.dirname(os.path.dirname(__file__))
-embed = hub.Module(os.path.join(file_dir,
-                                'data/universal-sentence-encoder'))
+# embed = hub.Module(os.path.join(file_dir,
+#                                 'data/universal-sentence-encoder'))
 cache = TTLCache(maxsize=100, ttl=300)
-session = tf.Session()
-session.run([tf.global_variables_initializer(), tf.tables_initializer()])
+# session = tf.Session()
+# session.run([tf.global_variables_initializer(), tf.tables_initializer()])
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
+                    level=logging.INFO)
 
 
 # 把句子转换为向量
 
+def model_load():
+    fname = os.path.join(file_dir,
+                         'data/GoogleNews-vectors-negative300.bin.gz')
+    model0 = KeyedVectors.load_word2vec_format(fname, binary=True)
+    logging.info('The model was loaded.')
+    return model0
+
+
+def init_model():
+    model0 = model_load()
+    vocab_dict0 = model0.wv.vocab
+    punc_string = string.punctuation + '。，“”‘’（）：；？·—《》、'
+    punc_set0 = {punc for punc in punc_string}
+    return model0, vocab_dict0, punc_set0
+
+
+model, vocab_dict, punc_set = init_model()
+
+
+def _get_word_vector(word):
+    # print(type(model.wv[word]))
+    return model.wv[word]
+
+
+class RecordSum:
+    record = np.empty(300)
+
+    def add(self, x):
+        self.record = np.mean(x, axis=0)
+
+
+record = RecordSum()
+
+
+@cached(cache)
+def _single_sentence(sentence: str) -> list:
+    word_list = word_tokenize(sentence)
+    word_list = [word for word in word_list if word not in punc_set]
+
+    word_list = [word for word in word_list if word in vocab_dict]
+    with Pool(2) as p:
+        word_vectors = p.map(_get_word_vector, word_list)
+        # print('Type of map result:', type(word_vectors))
+
+    st_vector = np.mean(word_vectors, axis=0)
+    st_vector = st_vector / np.linalg.norm(st_vector)
+    st_vector = st_vector.tolist()
+
+    return st_vector
+
+
 @cached(cache)
 def _sentence_embedding(sentences: tuple) -> np.ndarray:
-    embedding = tf.nn.l2_normalize(embed(sentences))
-    sen_embedding = session.run(embedding)
+    """use sentences as a tuple is to be consistent with tf.hub"""
+    # with Pool(2) as p:
+    #     sen_embedding = p.map(_single_sentence, sentences)
+    sen_embedding = [_single_sentence(st) for st in sentences]
+    sen_embedding = np.array(sen_embedding)
+
+    # embedding = tf.nn.l2_normalize(embed(sentences))
+    # sen_embedding = session.run(embedding)
 
     return sen_embedding
 
@@ -57,7 +120,7 @@ class VectorSimilarity:
 
 
 def _similarity_scores(training_vectors: np.ndarray,
-                       test_vector: np.ndarray) -> list:
+                       test_vector: list) -> list:
     """Assume for training vectors, the number of vectors is m, and the
     length of each vector is n, then time complexity is O(mn) for single
     thread. But in numpy, this could be optimized. For multiprocessing, time
@@ -65,9 +128,10 @@ def _similarity_scores(training_vectors: np.ndarray,
     """
 
     training_vectors = training_vectors.tolist()
-    test_vector = test_vector.tolist()
-    test_vector = test_vector[0]
+    test_vector = test_vector
 
+    # sim_scores = [_vector_similarity(training_vector, test_vector)
+    #               for training_vector in training_vectors]
     with Pool(2) as p:
         sim_scores = p.map(VectorSimilarity(test_vector),
                            training_vectors)
@@ -77,11 +141,9 @@ def _similarity_scores(training_vectors: np.ndarray,
 
 # 给定一个句子和一组句子，找出后者各个句子中和前者最为相似的句子
 
-def most_similar(training_sentences: tuple, test_sentence: tuple) -> str:
+def most_similar(training_sentences: tuple, test_sentence: str) -> str:
     training_embeddings = _sentence_embedding(training_sentences)
-    start = time.perf_counter()
-    test_embedding = _sentence_embedding(test_sentence)
-    print('time to get sentence vector:', time.perf_counter()-start)
+    test_embedding = _single_sentence(test_sentence)
     sim_scores = _similarity_scores(training_embeddings, test_embedding)
     idx = np.argmax(sim_scores)
     return training_sentences[idx]
@@ -94,8 +156,8 @@ def t_most_similar():
     print()
     print('Test t_most_similar()')
     training_sentences = ("The quick brown fox jumps over the lazy dog.",
-                          "Who is Messy")
-    test_sentence = ('Can you tell me something about Cristiano Ronaldo',)
+                          "Who is Messy?")
+    test_sentence = 'Can you tell me something about Cristiano Ronaldo?'
     top_sentence = most_similar(training_sentences, test_sentence)
     print("Most similar sentence of "
           "'Can you tell me something about Cristiano Ronaldo':")
@@ -108,8 +170,8 @@ def t2_most_similar():
     print()
     print('Test t2_most_similar()')
     training_sentences = ("The quick brown fox jumps over the lazy dog.",
-                          "Who is Messy")
-    test_sentence = ('Something about football',)
+                          "Who is Messy?")
+    test_sentence = 'Something about football.'
     top_sentence = most_similar(training_sentences, test_sentence)
     print("Most similar sentence of "
           "'Something about football':")
@@ -122,4 +184,4 @@ if __name__ == '__main__':
     t_most_similar()
     t2_most_similar()
 
-    session.close()
+    # session.close()
