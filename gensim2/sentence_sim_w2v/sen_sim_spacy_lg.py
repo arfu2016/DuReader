@@ -22,7 +22,7 @@ def most_similar(training_sentences: tuple, test_sentence: str) -> str:
     # print('doc_test:', doc_test.has_vector, doc_test.vector_norm)
 
     sim_scores = [doc_test.similarity(doc) for doc in docs]
-    # print('sim_scores', sim_scores)
+    print('sim_scores', sim_scores)
 
     idx = np.argmax(sim_scores)
     return training_sentences[idx]

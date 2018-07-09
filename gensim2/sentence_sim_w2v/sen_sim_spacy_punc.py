@@ -1,15 +1,14 @@
 """
 @Project   : DuReader
-@Module    : sen_sim_w2v_spacy.py
+@Module    : sen_sim_spacy_punc.py
 @Author    : Deco [deco@cubee.com]
-@Created   : 7/9/18 11:18 AM
+@Created   : 7/9/18 1:37 PM
 @Desc      : 
 """
 import logging
 import os
 import string
 import time
-# from multiprocessing import Pool
 
 import numpy as np
 import spacy
@@ -44,11 +43,12 @@ punc_set = init_punctuation()
 @cached(cache)
 def _single_sentence(sentence: str) -> list:
     word_list = nlp(sentence)
-    word_list = [word for word in word_list if word.text not in punc_set]
+    # word_list = [word for word in word_list if word.text not in punc_set]
     word_vectors = [word.vector for word in word_list
                     if word.has_vector]
-    print('word_list:', word_list)
-    print('Effective words:', [word for word in word_list if word.has_vector])
+    print('word_list:', [word.text for word in word_list])
+    print('Effective words:', [word.text for word in word_list
+                               if word.has_vector])
     st_matrix = np.array(word_vectors)
     st_vector = np.mean(st_matrix, axis=0)
     st_vector = st_vector / np.linalg.norm(st_vector)
@@ -61,8 +61,6 @@ def _single_sentence(sentence: str) -> list:
 def _sentence_embedding(sentences: tuple) -> np.ndarray:
     """use sentences as a tuple is to be consistent with tf.hub"""
     sen_embedding = [_single_sentence(st) for st in sentences]
-    # with Pool(2) as p:
-    #     sen_embedding = p.map(_single_sentence, sentences)
     sen_embedding = np.array(sen_embedding)
     return sen_embedding
 
