@@ -83,6 +83,7 @@ def most_similar(training_sentences: tuple, test_sentence: tuple) -> str:
     test_embedding = _sentence_embedding(test_sentence)
     print('time to get sentence vector:', time.perf_counter()-start)
     sim_scores = _similarity_scores(training_embeddings, test_embedding)
+    print('sim_scores:', sim_scores)
     idx = np.argmax(sim_scores)
     return training_sentences[idx]
 
@@ -93,7 +94,7 @@ def t_most_similar():
     start = time.perf_counter()
     print()
     print('Test t_most_similar()')
-    training_sentences = ("The quick brown fox jumps over the lazy dog.",
+    training_sentences = ("The quick brown fox jumps over the lazy dog",
                           "Who is Messy")
     test_sentence = ('Can you tell me something about Cristiano Ronaldo',)
     top_sentence = most_similar(training_sentences, test_sentence)
@@ -107,7 +108,7 @@ def t2_most_similar():
     start = time.perf_counter()
     print()
     print('Test t2_most_similar()')
-    training_sentences = ("The quick brown fox jumps over the lazy dog.",
+    training_sentences = ("The quick brown fox jumps over the lazy dog",
                           "Who is Messy")
     test_sentence = ('Something about football',)
     top_sentence = most_similar(training_sentences, test_sentence)
