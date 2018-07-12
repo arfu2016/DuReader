@@ -39,3 +39,16 @@ if __name__ == '__main__':
 
 # python run.py --train --algo MLSTM --epochs 2 --batch_size 16 --gpu "0,1"
 # python run.py --evaluate --algo MLSTM --batch_size 16
+
+
+# ssh 192.168.10.2
+# conda info --env
+# source activate dureader3
+# export PATH=/home/deco/local/cuda-8.0/bin${PATH:+:${PATH}}
+# export LD_LIBRARY_PATH=/home/deco/local/cuda-8.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+# nvcc --version
+# nvida-smi
+# cd projects/DuReader
+# python run.py --predict --algo MLSTM --batch_size 16 --gpu "0,1" --test_files '../data/demo/testset/search.test.json'
+# python run.py --evaluate --algo MLSTM --batch_size 16
+# python run.py --train --algo MLSTM --epochs 2 --batch_size 16 --gpu "0,1"
