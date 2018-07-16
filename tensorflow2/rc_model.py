@@ -132,7 +132,8 @@ class RCModel:
     def _setup_placeholders(self):
         """
         Placeholders, the variables that are not trainable
-        一个变量，但不是在训练中会改变的那种
+        一个变量，但不是在训练中会改变的那种，而且，在最后的计算中是要作为系数feed
+        过去的
         """
         self.p = tf.placeholder(tf.int32, [None, None])
         # 表示是二维数据，但具体维数可以不在这里给出，具体给数据时才确定
@@ -143,7 +144,8 @@ class RCModel:
         self.q_length = tf.placeholder(tf.int32, [None])
         self.start_label = tf.placeholder(tf.int32, [None])
         self.end_label = tf.placeholder(tf.int32, [None])
-        # 从实际回答到文中标注出来，比如用正则表达式
+        # 从实际回答到文中标注出来，比如用正则表达式，回答在文档中的什么位置，格式和实体
+        # 抽取所用的格式是类似的
         self.dropout_keep_prob = tf.placeholder(tf.float32)
         # 零维数据，也就是标量数据
 
@@ -155,6 +157,7 @@ class RCModel:
         with tf.device('/cpu:0'), tf.variable_scope('word_embedding'):
             # 此处指定使用cpu
             # 第一次建立这个variable_scope, 而不是reuse
+            # reuse中最重要的是模型中的trainable variable的复用
             self.word_embeddings = tf.get_variable(
                 'word_embeddings',
                 shape=(self.vocab.size(), self.vocab.embed_dim),
@@ -162,7 +165,8 @@ class RCModel:
                 # 把已经初始化好的embedding传过来
                 trainable=True
             )
-            # 生成variable，一般是可训练的
+            # 生成variable，一般是可训练的；如果不可训练，就是始终使用pretrained
+            # embedding
             self.p_emb = tf.nn.embedding_lookup(self.word_embeddings, self.p)
             # paragraph
             self.q_emb = tf.nn.embedding_lookup(self.word_embeddings, self.q)
