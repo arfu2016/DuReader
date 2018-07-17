@@ -3,7 +3,8 @@
 @Module    : lstm_testing.py
 @Author    : Deco [deco@cubee.com]
 @Created   : 5/18/18 10:24 AM
-@Desc      : 
+@Desc      :
+tensorflow==1.1
 """
 import numpy as np
 import tensorflow as tf
@@ -75,6 +76,7 @@ learning_rate = 0.001
 
 n_words = len(vocab_to_int) + 1
 # Adding 1 because we use 0's for padding, dictionary started at 1
+# n_words把表示padding的字符也算了进来，所以加了1
 
 # Create the graph object
 graph = tf.Graph()
@@ -155,7 +157,12 @@ with tf.Session(graph=graph) as sess:
                 labels_: y[:, None],
                 keep_prob: 1,
                 initial_state: test_state}
-        batch_acc, test_state = sess.run([accuracy, final_state],
-                                         feed_dict=feed)
+        batch_acc, output, f_state = sess.run(
+            [accuracy, outputs, final_state], feed_dict=feed)
         test_acc.append(batch_acc)
+    print('ii:', ii)
+    print('y.shape:', y.shape)  # 一维
+    print('y.shape:', y[:, None].shape)  # 二维
+    print('output.shape:', output.shape)
+    print('f_state.shape:', [f_state[0].c.shape, f_state[0].h.shape])
     print("Test accuracy: {:.3f}".format(np.mean(test_acc)))
