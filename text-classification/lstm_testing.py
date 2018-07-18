@@ -110,6 +110,11 @@ with graph.as_default():
     outputs, final_state = tf.nn.dynamic_rnn(cell, embed,
                                              initial_state=initial_state)
 
+    print('outputs.get_shape():', outputs.get_shape())
+    print('outputs[:, -1]', outputs[:, -1])
+    # tf.shape()得到的是一个tensor
+    # get_shape()得到的是一个nd.array
+
 with graph.as_default():
     predictions = tf.contrib.layers.fully_connected(outputs[:, -1], 1,
                                                     activation_fn=tf.sigmoid)

@@ -200,6 +200,7 @@ class RCModel:
         The core of RC model, get the question-aware passage
         encoding with either BIDAF or MLSTM
         The attention process
+        文档的加权句向量，权重由问句决定
         """
         if self.algo == 'MLSTM':
             match_layer = MatchLSTMLayer(self.hidden_size)
