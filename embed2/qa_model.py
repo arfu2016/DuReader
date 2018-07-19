@@ -64,6 +64,7 @@ class QaModel:
             # cell unit数目等于hidden unit数目
             # rnn的返回值既有output，也有hidden state，此处只记录output
             # 其实是从一个矩阵变换到了另一个矩阵
+            # 词向量是300维，self.hidden_size是150，由于'bi-lstm'，最终还是300维
         with tf.variable_scope('question_encoding'):
             self.sep_q_encodes, _ = rnn('bi-lstm', self.q_emb, self.q_length,
                                         self.hidden_size)
@@ -108,3 +109,4 @@ class QaModel:
             # attention之后，再用bi-lstm做一次矩阵变换，是真正的encode
             # 此处lstm的layer_num是可调的（layer_num大于1的话，似乎代码有bug）
             # 同样只记录outputs，作为pointer net选择的对象
+            # 再用一个新的bi-lstm做一次变换，得到的还是文档词向量，还是300维
