@@ -187,6 +187,8 @@ class RCModel:
             # p的长度；hidden_size是这个rnn中lstm的hidden unit数目，是可以调参的
             # rnn的返回值既有output，也有hidden state，此处只记录output
             # 其实是从一个矩阵变换到了另一个矩阵
+            print('The shpae of sep encodes:',
+                  self.sep_p_encodes.get_shape())
         with tf.variable_scope('question_encoding'):
             self.sep_q_encodes, _ = rnn('bi-lstm', self.q_emb, self.q_length,
                                         self.hidden_size)
@@ -220,6 +222,8 @@ class RCModel:
         # 但这种关系如何建模，一般是采取attention的方式来建模，不管MLSM还是DIDAF，
         # 用的都是这种方式，只不过细节不同
         # 只记录lstm的outputs，不记录hidden states
+        print('The shpae of match encodes:',
+              self.match_p_encodes.get_shape())
         if self.use_dropout:
             self.match_p_encodes = tf.nn.dropout(self.match_p_encodes,
                                                  self.dropout_keep_prob)

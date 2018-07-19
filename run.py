@@ -52,3 +52,5 @@ if __name__ == '__main__':
 # python run.py --predict --algo MLSTM --batch_size 16 --gpu "0,1" --test_files '../data/demo/testset/search.test.json'
 # python run.py --evaluate --algo MLSTM --batch_size 16
 # python run.py --train --algo MLSTM --epochs 2 --batch_size 16 --gpu "0,1"
+
+# python run.py --predict --algo MLSTM --batch_size 16 --test_files '../data/demo/testset/search.test.json'
