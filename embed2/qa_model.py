@@ -68,6 +68,7 @@ class QaModel:
             self.sep_q_encodes, _ = rnn('bi-lstm', self.q_emb, self.q_length,
                                         self.hidden_size)
             # self.sep_p_encodes, self.sep_q_encodes都是句子矩阵
+            # 对于句子矩阵，因为维度还是词的个数*hidden_size，所以本质上还是词向量，是变换过的词向量
 
     def _match(self):
         """
@@ -93,3 +94,17 @@ class QaModel:
         # 但这种关系如何建模，一般是采取attention的方式来建模，不管MLSM还是DIDAF，
         # 用的都是这种方式，只不过细节不同
         # 只记录lstm的outputs，不记录hidden states
+        # 在利用问句词向量加权之后，最终得到的还是文档词向量，还是一个矩阵
+
+    def _fuse(self):
+        """
+        Employs Bi-LSTM again to fuse the context information after match layer
+        得到新的rnn
+        """
+        with tf.variable_scope('fusion'):
+            self.fuse_p_encodes, _ = rnn('bi-lstm', self.match_p_encodes,
+                                         self.p_length,
+                                         self.hidden_size, layer_num=1)
+            # attention之后，再用bi-lstm做一次矩阵变换，是真正的encode
+            # 此处lstm的layer_num是可调的（layer_num大于1的话，似乎代码有bug）
+            # 同样只记录outputs，作为pointer net选择的对象

@@ -182,7 +182,8 @@ class RCModel:
             self.sep_p_encodes, _ = rnn('bi-lstm', self.p_emb, self.p_length,
                                         self.hidden_size)
             # self.p_emb是二维的，一个维度是batch size，另一个维度是多个sample中最长的
-            # p的长度；self.p_length是一维的，长度是batch size，具体内容是各个sample的
+            # p的长度（三个维度？还有一个维度是word embedding的维度）；
+            # self.p_length是一维的，长度是batch size，具体内容是各个sample的
             # p的长度；hidden_size是这个rnn中lstm的hidden unit数目，是可以调参的
             # rnn的返回值既有output，也有hidden state，此处只记录output
             # 其实是从一个矩阵变换到了另一个矩阵
@@ -238,6 +239,9 @@ class RCModel:
             if self.use_dropout:
                 self.fuse_p_encodes = tf.nn.dropout(self.fuse_p_encodes,
                                                     self.dropout_keep_prob)
+            print('hidden_size in _fuse in rc_model.py:', self.hidden_size)
+            print('The shpae of fuse encodes:',
+                  self.fuse_p_encodes.get_shape())
 
     def _decode(self):
         """
