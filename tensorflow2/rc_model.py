@@ -257,8 +257,8 @@ class RCModel:
         we select the first one.
         """
         with tf.variable_scope('same_question_concat'):
-            print('The shape of fuse encodes:',
-                  self.fuse_p_encodes.get_shape())
+            # print('The shape of fuse encodes:',
+            #       self.fuse_p_encodes.get_shape())
             batch_size = tf.shape(self.start_label)[0]
             concat_passage_encodes = tf.reshape(
                 self.fuse_p_encodes,
@@ -270,8 +270,8 @@ class RCModel:
             # 这一步，就出错了
             # 文章信息，其实是把q合并在p上之后的信息
 
-            print('The shape of q1 encodes:',
-                  self.sep_q_encodes.get_shape())
+            # print('The shape of q1 encodes:',
+            #       self.sep_q_encodes.get_shape())
             no_dup_question_encodes = tf.reshape(
                 self.sep_q_encodes,
                 [batch_size, -1, tf.shape(self.sep_q_encodes)[1],
@@ -280,8 +280,9 @@ class RCModel:
                 # tf.shape(self.sep_q_encodes)[1]，现在的第二维事实上只有一行
             )[0:, 0, 0:, 0:]
             # 问题信息，四个维度，其中第二个维度只取了一列数据，结果还是三维的
-            print('The shape of q2 encodes:',
-                  self.sep_q_encodes.get_shape())
+            # 同样，这一步也没啥效果
+            # print('The shape of q2 encodes:',
+            #       self.sep_q_encodes.get_shape())
         decoder = PointerNetDecoder(self.hidden_size)
         # self.fw_outputs, self.fw_outputs2, self.bw_outputs = \
         #     decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
@@ -290,7 +291,8 @@ class RCModel:
         self.start_probs, self.end_probs = decoder.decode(
             concat_passage_encodes, no_dup_question_encodes)
         # decoder也是用的bi-lstm，no_dup_question_encodes作为hidden states输入，
-        # input是一个fake input，concat_passage_encodes是pointer net所用的矩阵
+        # input是一个fake input，concat_passage_encodes是pointer net所用的矩阵，
+        # 是分类的时候用的，开始位置有一次分类，结束位置有一次分类
 
         # 最终算出来的是passage中各个位置充当start的概率，和充当end的概率
         # 具体怎么对待这两个概率，可以有多种规则，多种算法
