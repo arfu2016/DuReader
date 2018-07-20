@@ -257,6 +257,8 @@ class RCModel:
         we select the first one.
         """
         with tf.variable_scope('same_question_concat'):
+            print('The shape of fuse encodes:',
+                  self.fuse_p_encodes.get_shape())
             batch_size = tf.shape(self.start_label)[0]
             concat_passage_encodes = tf.reshape(
                 self.fuse_p_encodes,
@@ -267,10 +269,14 @@ class RCModel:
             # 如果产生passage_encodes使用的是average模式，那就更不该有这一步，若是有
             # 这一步，就出错了
             # 文章信息，其实是把q合并在p上之后的信息
+
+            print('The shape of q encodes:',
+                  self.sep_q_encodes.get_shape())
             no_dup_question_encodes = tf.reshape(
                 self.sep_q_encodes,
                 [batch_size, -1, tf.shape(self.sep_q_encodes)[1],
                  2 * self.hidden_size]
+                # tf.shape(self.sep_q_encodes)[1]表示
             )[0:, 0, 0:, 0:]
             # 问题信息，四个维度，其中第二个维度只取了一列数据
         decoder = PointerNetDecoder(self.hidden_size)
