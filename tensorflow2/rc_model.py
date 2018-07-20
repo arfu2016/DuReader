@@ -270,15 +270,18 @@ class RCModel:
             # 这一步，就出错了
             # 文章信息，其实是把q合并在p上之后的信息
 
-            print('The shape of q encodes:',
+            print('The shape of q1 encodes:',
                   self.sep_q_encodes.get_shape())
             no_dup_question_encodes = tf.reshape(
                 self.sep_q_encodes,
                 [batch_size, -1, tf.shape(self.sep_q_encodes)[1],
                  2 * self.hidden_size]
-                # tf.shape(self.sep_q_encodes)[1]表示
+                # 三维变四维，现在的第三维变成了原来的第二维
+                # tf.shape(self.sep_q_encodes)[1]，现在的第二维事实上只有一行
             )[0:, 0, 0:, 0:]
-            # 问题信息，四个维度，其中第二个维度只取了一列数据
+            # 问题信息，四个维度，其中第二个维度只取了一列数据，结果还是三维的
+            print('The shape of q2 encodes:',
+                  self.sep_q_encodes.get_shape())
         decoder = PointerNetDecoder(self.hidden_size)
         # self.fw_outputs, self.fw_outputs2, self.bw_outputs = \
         #     decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
