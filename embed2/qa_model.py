@@ -11,6 +11,7 @@ import tensorflow as tf
 from embed2.basic_rnn import rnn
 from embed2.match_layer import MatchLSTMLayer
 from embed2.match_layer import AttentionFlowMatchLayer
+from embed2.pointer_net import PointerNetDecoder
 
 
 class QaModel:
@@ -110,3 +111,14 @@ class QaModel:
             # 此处lstm的layer_num是可调的（layer_num大于1的话，似乎代码有bug）
             # 同样只记录outputs，作为pointer net选择的对象
             # 再用一个新的bi-lstm做一次变换，得到的还是文档词向量，还是300维
+
+    def _decode(self):
+        decoder = PointerNetDecoder(self.hidden_size)
+        self.start_probs, self.end_probs = decoder.decode(
+            self.fuse_p_encodes, self.sep_q_encodes)
+        # 在普通的seq2seq model中，decoder的输入是一个词的词向量，得到输出的unit维度向量，
+        # 然后通过softmax转变成很多个分类。
+        # 在seq2seq中加入attention以后，decoder的输入除了一个词的词向量之外，还多了
+        # 一个词向量，然后得到输出的unit维度向量，通过softmax转变成很多个分类。
+        # 在pointer net中，decoder的输入其实是一个文档词向量矩阵，与作为hidden state的
+        # 问句词向量矩阵互作后，得到的输出是word维度向量，直接就反映了各个word分类的概率
