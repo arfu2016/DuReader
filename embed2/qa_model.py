@@ -23,6 +23,9 @@ class QaModel:
         self.q_length = tf.placeholder(tf.int32, [None])
         self.hidden_size = 16
         self.algo = 'MLSTM'
+        self.start_label = tf.placeholder(tf.int32, [None])
+        self.end_label = tf.placeholder(tf.int32, [None])
+        self.weight_decay = 0.01
 
     def _embed(self):
         """
@@ -122,3 +125,41 @@ class QaModel:
         # 一个词向量，然后得到输出的unit维度向量，通过softmax转变成很多个分类。
         # 在pointer net中，decoder的输入其实是一个文档词向量矩阵，与作为hidden state的
         # 问句词向量矩阵互作后，得到的输出是word维度向量，直接就反映了各个word分类的概率
+
+    def _compute_loss(self):
+        """
+        The loss function
+        计算损失函数就为了之后的参数优化，本质上是为了back propagation
+        此处损失函数用的还是cross entropy，既考虑start loss，也考虑end loss，把
+        二者结合起来。在做拟合和推测时，都用到start prob和end prob，但处理方法是不同的
+        还有一种处理方法，更类似加强学习，就是拟合的结果不和answer相比，而是把目标
+        函数变成start_prob*end_prob的最大化
+        """
+
+        def sparse_nll_loss(probs, labels, epsilon=1e-9, scope=None):
+            """
+            negative log likelyhood loss
+            """
+            with tf.name_scope(scope, "log_loss"):
+                # 此处是name_scope
+                labels = tf.one_hot(labels, tf.shape(probs)[1], axis=1)
+                # labels是具体位置的序号，此处要one hot encoding
+                losses = - tf.reduce_sum(labels * tf.log(probs + epsilon), 1)
+                # cross entropy的公式, + epsilon是为了处理probs为0的情况
+            return losses
+
+        self.start_loss = sparse_nll_loss(probs=self.start_probs,
+                                          labels=self.start_label)
+        self.end_loss = sparse_nll_loss(probs=self.end_probs,
+                                        labels=self.end_label)
+        # 要算两个cross entropy的loss，start和end各算一次
+        self.all_params = tf.trainable_variables()
+        self.loss = tf.reduce_mean(tf.add(self.start_loss, self.end_loss))
+        # 优化的目标函数：两个loss的加和求最小值
+        if self.weight_decay > 0:
+            with tf.variable_scope('l2_loss'):
+                l2_loss = tf.add_n([tf.nn.l2_loss(v) for v in self.all_params])
+                # 做l2 regularization，使得拟合的weight不至于太大
+            self.loss += self.weight_decay * l2_loss
+            # self.weight_decay就是做l2 regularization时前面的那个系数，
+            # 用来控制正则化的程度

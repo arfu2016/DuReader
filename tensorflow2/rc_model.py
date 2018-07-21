@@ -333,6 +333,8 @@ class RCModel:
                 l2_loss = tf.add_n([tf.nn.l2_loss(v) for v in self.all_params])
                 # 做l2 regularization，使得拟合的weight不至于太大
             self.loss += self.weight_decay * l2_loss
+            # self.weight_decay就是做l2 regularization时前面的那个系数，
+            # 用来控制正则化的程度
 
     def _create_train_op(self):
         """
