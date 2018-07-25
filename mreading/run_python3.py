@@ -25,6 +25,7 @@ if base_dir not in sys.path:
 
 from mreading.dataset import BRCDataset
 from mreading.vocab import Vocab
+from mreading.rc_model import RCModel
 
 os.chdir(os.path.join(base_dir, 'mreading'))
 # 改变当前目录，因为后面要用到父目录，祖父目录
