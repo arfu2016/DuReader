@@ -206,7 +206,7 @@ def train(args, restore=True):
         # except Exception as e:
         except tf.errors.InvalidArgumentError:
             # logger.info('Exception in train() in run_python3.py', e)
-            logger.exception('InvalidArgumentError, Have to initialize '
+            logger.info('InvalidArgumentError, Have to initialize '
                              'the model from beginning')
             # str(e) or repr(e)
         except Exception:
