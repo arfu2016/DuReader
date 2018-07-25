@@ -101,7 +101,7 @@ class RCModel:
                 shape=(self.vocab.size(), self.vocab.embed_dim),
                 initializer=tf.constant_initializer(self.vocab.embeddings),
                 # 把已经初始化好的embedding传过来
-                trainable=False
+                trainable=True
             )
             # 生成variable，一般是可训练的；如果不可训练，就是始终使用pretrained
             # embedding
@@ -241,6 +241,8 @@ class RCModel:
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
 
+            self.logger.info(self.sess.run(tf.shape(
+                self.word_embeddings), feed_dict))
             self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
