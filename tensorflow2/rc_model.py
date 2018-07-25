@@ -430,13 +430,14 @@ class RCModel:
             # results_g = self.sess.run(self.capped_gradients[1][0], feed_dict)
             # print('results_g in _train_epoch in rc_model.py:', results_g)
 
-            self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
-            self.logger.debug(
-                self.sess.run(tf.shape(self.sep_p_encodes), feed_dict))
-            self.logger.debug(
-                self.sess.run(tf.shape(self.match_p_encodes), feed_dict))
-            self.logger.debug(
-                self.sess.run(tf.shape(self.fuse_p_encodes), feed_dict))
+            # self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
+            # self.logger.debug(
+            #     self.sess.run(tf.shape(self.sep_p_encodes), feed_dict))
+            # self.logger.debug(
+            #     self.sess.run(tf.shape(self.match_p_encodes), feed_dict))
+            # self.logger.debug(
+            #     self.sess.run(tf.shape(self.fuse_p_encodes), feed_dict))
+
             # self.logger.debug(
             #     self.sess.run(tf.shape(concat_passage_encodes), feed_dict))
             # self.logger.debug(

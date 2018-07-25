@@ -268,16 +268,16 @@ class RCModel:
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
 
-            self.logger.debug(self.sess.run(tf.shape(self.p), feed_dict))
-            self.logger.info(self.sess.run(tf.shape(
-                self.word_embeddings), feed_dict))
-            self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
-            self.logger.debug(
-                self.sess.run(
-                    tf.shape(self.concat_passage_encodes), feed_dict))
-            self.logger.debug(
-                self.sess.run(
-                    tf.shape(self.no_dup_question_encodes), feed_dict))
+            # self.logger.debug(self.sess.run(tf.shape(self.p), feed_dict))
+            # self.logger.info(self.sess.run(tf.shape(
+            #     self.word_embeddings), feed_dict))
+            # self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
+            # self.logger.debug(
+            #     self.sess.run(
+            #         tf.shape(self.concat_passage_encodes), feed_dict))
+            # self.logger.debug(
+            #     self.sess.run(
+            #         tf.shape(self.no_dup_question_encodes), feed_dict))
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             # variable自动更新，返回的也是更新后的variable，这里就不记录了
@@ -286,7 +286,7 @@ class RCModel:
             # loss是根据batch size平均后的结果，这里进行加总
             total_num += len(batch['raw_data'])
             # 累加batch size，或者最后一批剩下的数目
-            print('total_num in rc_model.py', total_num)
+            self.logger.info('total_num in rc_model.py: {}'.format(total_num))
             n_batch_loss += loss
             if log_every_n_batch > 0 and bitx % log_every_n_batch == 0:
                 self.logger.info(
