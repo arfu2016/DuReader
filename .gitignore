@@ -8,3 +8,4 @@ local
 add_copyright.py
 copyright
 .DS_Store
+mysql2/settings.py
