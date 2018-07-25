@@ -34,12 +34,12 @@ class RCModel:
         if args.log_path:
             file_handler = logging.FileHandler(args.log_path)
             # 会通过命令行传进来args.log_path，或者用默认值
-            file_handler.setLevel(logging.INFO)
+            file_handler.setLevel(logging.DEBUG)
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
         else:
             console_handler = logging.StreamHandler()
-            console_handler.setLevel(logging.INFO)
+            console_handler.setLevel(logging.DEBUG)
             console_handler.setFormatter(formatter)
             logger.addHandler(console_handler)
         self.logger = logger
@@ -256,7 +256,6 @@ class RCModel:
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
 
-            print(self.sess.run(tf.shape(self.word_embeddings), feed_dict))
             self.logger.info(self.sess.run(tf.shape(
                 self.word_embeddings), feed_dict))
             self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
