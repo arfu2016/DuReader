@@ -256,6 +256,7 @@ class RCModel:
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
 
+            self.logger.debug(self.sess.run(tf.shape(self.p), feed_dict))
             self.logger.info(self.sess.run(tf.shape(
                 self.word_embeddings), feed_dict))
             self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
