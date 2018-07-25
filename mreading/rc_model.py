@@ -51,11 +51,12 @@ class RCModel:
         sess_config.gpu_options.allow_growth = True
         # 并不是把gpu一开始就全部占据，而是逐步增加占掉的显存和计算力
         self.sess = tf.Session(config=sess_config)
-        self.sess.run(tf.global_variables_initializer())
 
         self._build_graph()
 
         self.saver = tf.train.Saver()
+
+        self.sess.run(tf.global_variables_initializer())
 
     def _build_graph(self):
         """
