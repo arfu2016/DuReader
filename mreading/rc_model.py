@@ -10,6 +10,7 @@ import logging
 import os
 import time
 
+import numpy as np
 import tensorflow as tf
 
 from tensorflow2.layers.match_layer import AttentionFlowMatchLayer
@@ -85,6 +86,14 @@ class RCModel:
         self._decode()
         self._compute_loss()
         self._create_train_op()
+        self.logger.info(
+            'Time to build graph: {} s'.format(time.time() - start_t))
+        param_num = sum([np.prod(self.sess.run(tf.shape(v)))
+                         for v in self.all_params])
+        # 列表中数字的连乘，先乘后加，计算参数个数
+        # parameter number of the model
+        self.logger.info(
+            'There are {} parameters in the model'.format(param_num))
 
     def _setup_placeholders(self):
         """

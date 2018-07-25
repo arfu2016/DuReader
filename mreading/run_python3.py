@@ -206,11 +206,12 @@ def train(args, restore=True):
         # except Exception as e:
         except tf.errors.InvalidArgumentError:
             # logger.info('Exception in train() in run_python3.py', e)
-            logger.info('InvalidArgumentError, Have to initialize '
-                             'the model from beginning')
+            logger.info('InvalidArgumentError... '
+                        'Initialize the model from beginning')
             # str(e) or repr(e)
         except Exception:
-            logger.exception('Have to initialize the model from beginning')
+            logger.info('Unknown exception. '
+                        'Initialize the model from beginning')
 
     logger.info('Training the model...')
     rc_model.train(brc_data, args.epochs, args.batch_size,

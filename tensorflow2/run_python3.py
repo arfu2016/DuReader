@@ -213,11 +213,11 @@ def train(args, restore=True):
         # except Exception as e:
         except tf.errors.InvalidArgumentError:
             # logger.info('Exception in train() in run_python3.py', e)
-            logger.info('Exception in train() in run_python3.py. '
+            logger.info('InvalidArgumentError in train() in run_python3.py. '
                         'Initialize the model from beginning')
             # str(e) or repr(e)
         except Exception:
-            logger.exception('Unknown exception in train() in run_python3.py. '
+            logger.info('Unknown exception in train() in run_python3.py. '
                              'Initialize the model from beginning')
 
     logger.info('Training the model...')
