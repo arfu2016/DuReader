@@ -52,7 +52,7 @@ class RCModel:
     def __init__(self, vocab, args):
 
         # logging
-        logger = logging.getLogger("mreading.rc_model")
+        logger = logging.getLogger("tensorflow2.rc_model")
         logger.setLevel(logging.DEBUG)
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s')
@@ -435,6 +435,12 @@ class RCModel:
                 self.sess.run(tf.shape(self.sep_p_encodes), feed_dict))
             self.logger.debug(
                 self.sess.run(tf.shape(self.match_p_encodes), feed_dict))
+            self.logger.debug(
+                self.sess.run(tf.shape(self.fuse_p_encodes), feed_dict))
+            # self.logger.debug(
+            #     self.sess.run(tf.shape(concat_passage_encodes), feed_dict))
+            # self.logger.debug(
+            #     self.sess.run(tf.shape(no_dup_question_encodes), feed_dict))
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             # variable自动更新，返回的也是更新后的variable，这里就不记录了

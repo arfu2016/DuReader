@@ -55,4 +55,5 @@ if __name__ == '__main__':
 
 # python run.py --predict --algo MLSTM --batch_size 16 --test_files '../data/demo/testset/search.test.json'
 
+# python run.py --train --algo MLSTM --epochs 2 --batch_size 16
 # python mreading/run_python3.py --train --algo MLSTM --epochs 2 --batch_size 16

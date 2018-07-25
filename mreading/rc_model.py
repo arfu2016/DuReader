@@ -167,15 +167,27 @@ class RCModel:
         we select the first one.
         """
         with tf.variable_scope('same_question_concat'):
-            concat_passage_encodes = self.fuse_p_encodes
-            no_dup_question_encodes = self.sep_q_encodes
+            batch_size = tf.shape(self.start_label)[0]
+            self.concat_passage_encodes = tf.reshape(
+                self.fuse_p_encodes,
+                [batch_size, -1, 2 * self.hidden_size]
+            )
+            # 维度调整，主要是第一维从batch_size*5调整为batch_size，
+            # 第二维原来是passage的长度，现在变为之前值的5倍，因为有5段
+
+            self.no_dup_question_encodes = tf.reshape(
+                self.sep_q_encodes,
+                [batch_size, -1, tf.shape(self.sep_q_encodes)[1],
+                 2 * self.hidden_size])[0:, 0, 0:, 0:]
+            # 维度调整，主要是第一维从batch_size*5调整为batch_size
+
         decoder = PointerNetDecoder(self.hidden_size)
         # self.fw_outputs, self.fw_outputs2, self.bw_outputs = \
         #     decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
         # self.fw_cell, self.bw_cell, self.fw_cell1 = \
         #     decoder.decode2(concat_passage_encodes, no_dup_question_encodes)
         self.start_probs, self.end_probs = decoder.decode(
-            concat_passage_encodes, no_dup_question_encodes)
+            self.concat_passage_encodes, self.no_dup_question_encodes)
 
     def _compute_loss(self):
         """
@@ -260,6 +272,12 @@ class RCModel:
             self.logger.info(self.sess.run(tf.shape(
                 self.word_embeddings), feed_dict))
             self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
+            self.logger.debug(
+                self.sess.run(
+                    tf.shape(self.concat_passage_encodes), feed_dict))
+            self.logger.debug(
+                self.sess.run(
+                    tf.shape(self.no_dup_question_encodes), feed_dict))
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             # variable自动更新，返回的也是更新后的variable，这里就不记录了
