@@ -31,7 +31,18 @@ class BRCDataset:
         if test_files is None:
             test_files = []
 
-        self.logger = logging.getLogger("brc")
+        logger = logging.getLogger("mreading.dataset")
+        logger.setLevel(logging.INFO)
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s')
+
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+
+        self.logger = logger
+
         self.max_p_num = max_p_num
         self.max_p_len = max_p_len
         self.max_q_len = max_q_len

@@ -94,6 +94,9 @@ class RCModel:
         # parameter number of the model
         self.logger.info(
             'There are {} parameters in the model'.format(param_num))
+        word_dim = self.sess.run(tf.shape(self.word_embeddings))
+        self.logger.debug(
+            'Word parameter number: {}'.format(word_dim[0] * word_dim[1]))
 
     def _setup_placeholders(self):
         """
@@ -278,8 +281,7 @@ class RCModel:
                          self.dropout_keep_prob: dropout_keep_prob}
 
             # self.logger.debug(self.sess.run(tf.shape(self.p), feed_dict))
-            # self.logger.info(self.sess.run(tf.shape(
-            #     self.word_embeddings), feed_dict))
+
             # self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
             # self.logger.debug(
             #     self.sess.run(
