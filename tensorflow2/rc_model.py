@@ -52,7 +52,22 @@ class RCModel:
     def __init__(self, vocab, args):
 
         # logging
-        self.logger = logging.getLogger("brc")
+        logger = logging.getLogger("mreading.rc_model")
+        logger.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s')
+        if args.log_path:
+            file_handler = logging.FileHandler(args.log_path)
+            # 会通过命令行传进来args.log_path，或者用默认值
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+        else:
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.DEBUG)
+            console_handler.setFormatter(formatter)
+            logger.addHandler(console_handler)
+        self.logger = logger
 
         # basic config
         self.algo = args.algo
@@ -414,6 +429,12 @@ class RCModel:
 
             # results_g = self.sess.run(self.capped_gradients[1][0], feed_dict)
             # print('results_g in _train_epoch in rc_model.py:', results_g)
+
+            self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
+            self.logger.debug(
+                self.sess.run(tf.shape(self.sep_p_encodes), feed_dict))
+            self.logger.debug(
+                self.sess.run(tf.shape(self.match_p_encodes), feed_dict))
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             # variable自动更新，返回的也是更新后的variable，这里就不记录了

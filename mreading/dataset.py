@@ -169,6 +169,8 @@ class BRCDataset:
                         'passages'][pidx]['passage_token_ids']
                     batch_data['passage_token_ids'].append(
                         passage_token_ids)
+                    # 一般来说，max_passage_num是5，也就是每个问题对应着5段文档
+                    # 所以batch_data['passage_token_ids']的维度是(16*5, 500)
                     batch_data['passage_length'].append(
                         min(len(passage_token_ids), self.max_p_len))
                     # 'passage_length'最大按self.max_p_len算

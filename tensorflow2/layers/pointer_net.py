@@ -129,10 +129,10 @@ class PointerNetLSTMCell(tc.rnn.LSTMCell):
                                          1))
             logits = tc.layers.fully_connected(U, num_outputs=1, activation_fn=None)
             scores = tf.nn.softmax(logits, 1)
-            print('scores:', scores.get_shape())
+            # print('scores:', scores.get_shape())
             attended_context = tf.reduce_sum(self.context_to_point * scores, axis=1)
             lstm_out, lstm_state = super(PointerNetLSTMCell, self).__call__(attended_context, state)
-        print('tf.squeeze(scores, -1):', tf.squeeze(scores, -1).get_shape())
+        # print('tf.squeeze(scores, -1):', tf.squeeze(scores, -1).get_shape())
         return tf.squeeze(scores, -1), lstm_state
 
 
