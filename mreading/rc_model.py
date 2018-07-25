@@ -28,6 +28,7 @@ class RCModel:
 
         # logging
         self.logger = logging.getLogger("mreading.rc_model")
+        self.logger.setLevel(logging.DEBUG)
 
         # basic config
         self.algo = args.algo
@@ -50,12 +51,11 @@ class RCModel:
         sess_config.gpu_options.allow_growth = True
         # 并不是把gpu一开始就全部占据，而是逐步增加占掉的显存和计算力
         self.sess = tf.Session(config=sess_config)
+        self.sess.run(tf.global_variables_initializer())
 
         self._build_graph()
 
         self.saver = tf.train.Saver()
-
-        self.sess.run(tf.global_variables_initializer())
 
     def _build_graph(self):
         """
@@ -240,6 +240,8 @@ class RCModel:
                          self.start_label: batch['start_id'],
                          self.end_label: batch['end_id'],
                          self.dropout_keep_prob: dropout_keep_prob}
+
+            self.logger.debug(self.sess.run(tf.shape(self.p_emb), feed_dict))
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             # variable自动更新，返回的也是更新后的variable，这里就不记录了
