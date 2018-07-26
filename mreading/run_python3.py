@@ -121,13 +121,14 @@ def parse_args():
 
     path_settings.add_argument('--vocab_dir', default='../data/vocab/',
                                help='the dir to save vocabulary')
-    path_settings.add_argument('--model_dir', default='../data/models/simple/',
+    path_settings.add_argument('--model_dir',
+                               default='../data/models/simple_preprocess/',
                                help='the dir to store models')
     path_settings.add_argument('--result_dir',
-                               default='../data/results/simple/',
+                               default='../data/results/simple_preprocess/',
                                help='the dir to output the results')
     path_settings.add_argument('--summary_dir',
-                               default='../data/summary/simple/',
+                               default='../data/summary/simple_preprocess/',
                                help='the dir to write tensorboard summary')
     path_settings.add_argument('--log_path',
                                help='path of the log file. If not set, '
