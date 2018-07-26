@@ -13,23 +13,36 @@ import os
 import pickle
 import random
 import sys
+from importlib import import_module
 
 import tensorflow as tf
 
 base_dir = os.path.dirname(
     os.path.dirname(
         os.path.abspath(__file__)))
-if base_dir not in sys.path:
-    sys.path.insert(0, base_dir)
-# 以base_dir为基准开始导入
 
-from mreading.dataset import BRCDataset
-from mreading.vocab import Vocab
-from mreading.rc_model import RCModel
+try:
+
+    from mreading.dataset import BRCDataset
+    from mreading.vocab import Vocab
+    from mreading.rc_model import RCModel
+
+except ImportError:
+
+    if base_dir not in sys.path:
+        sys.path.insert(0, base_dir)
+        # 以base_dir为基准开始导入
+
+    module_dataset = import_module('.dataset', package='mreading')
+    module_vocab = import_module('.vocab', package='mreading')
+    module_rc_model = import_module('.rc_model', package='mreading')
+
+    BRCDataset = getattr(module_dataset, 'BRCDataset')
+    Vocab = getattr(module_vocab, 'Vocab')
+    RCModel = getattr(module_rc_model, 'RCModel')
 
 os.chdir(os.path.join(base_dir, 'mreading'))
 # 改变当前目录，因为后面要用到父目录，祖父目录
-
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 # 设置环境变量，控制tensorflow的log level
 
