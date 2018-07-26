@@ -13,9 +13,9 @@ import time
 import numpy as np
 import tensorflow as tf
 
-from tensorflow2.layers.match_layer import AttentionFlowMatchLayer
-from tensorflow2.layers.match_layer import MatchLSTMLayer
-from tensorflow2.layers.pointer_net import PointerNetDecoder
+from mreading.layers.match_layer import AttentionFlowMatchLayer
+from mreading.layers.match_layer import MatchLSTMLayer
+from mreading.layers.pointer_net import PointerNetDecoder
 from utils import compute_bleu_rouge
 from utils import normalize
 
