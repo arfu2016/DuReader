@@ -231,6 +231,9 @@ class RCModel:
         self.all_params = tf.trainable_variables()
         self.loss = tf.reduce_mean(tf.add(self.start_loss, self.end_loss))
         # 优化的目标函数：两个loss的加和求最小值
+        # 评估的时候使用的是bleu4和rouge，这里为了避免过拟合，并没有在loss function中
+        # 针对bleu4和rouge做优化。如果做了优化，最后的评分肯定能更高，但不代表是更正确的
+        # 模型
         if self.weight_decay > 0:
             with tf.variable_scope('l2_loss'):
                 l2_loss = tf.add_n([tf.nn.l2_loss(v) for v in self.all_params])

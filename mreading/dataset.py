@@ -82,7 +82,9 @@ class BRCDataset:
                 if train:
                     if len(sample['answer_spans']) == 0:
                         continue
-                    if sample['answer_spans'][0][1] >= self.max_p_len:
+                    # if sample['answer_spans'][0][1] >= self.max_p_len:
+                    if sample['answer_spans'][0][1] - \
+                            sample['answer_spans'][0][0] >= self.max_p_len:
                         continue
                     # 对容错的考虑
                     # 如果没有'answer_spans'或者answer_spans太长，该行数据就被舍弃了，
@@ -162,6 +164,7 @@ class BRCDataset:
                       'passage_length': [],
                       'start_id': [],
                       'end_id': []}
+        # 这里用来对语料做标记，主要是标记start_id和end_id
         max_passage_num = max(
             [len(sample['passages']) for sample in batch_data['raw_data']])
         # 这一批数据中段落数目最大的样本
@@ -201,6 +204,14 @@ class BRCDataset:
                 # 对于train和validate数据，'answer_passages'这个字段是必需的
                 gold_passage_offset = padded_p_len * sample[
                     'answer_passages'][0]
+                # 如果是16个batch，由于每个问题给出了5个document，开始的时候数据的第一维
+                # 是16*5=80，但后来会缩减为16，padded_p_len是用于训练的每个文档的长度，
+                # sample['answer_passages'][0]中放的是答案在第几个文档中的信息，所以
+                # 二者相乘就是答案所在文档的起始点。
+
+                # 这里，只取了sample['answer_passages']中的第一个元素，也就是说我们假
+                # 设只有一个答案，实际上，dureader数据集是给出了多个答案的.
+                # 如果考虑多个答案的话，最终的评分有可能会更高。
                 batch_data['start_id'].append(
                     gold_passage_offset + sample['answer_spans'][0][0])
                 # answer span给出的list以0开始，以answer长度终止
