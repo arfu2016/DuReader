@@ -68,80 +68,68 @@ class BRCDataset:
         """
         logger.debug(data_path)
         with open(data_path, encoding='utf-8') as fin:
-            data_set = []
+            data_set, all_answers = [], []
+            sample = dict()
 
             logger.debug('Begin to load data from json file...')
+            squad = json.load(fin)['data']
 
-            for lidx, line in enumerate(fin):
-                sample = json.loads(line.strip())
+            # for lidx, line in enumerate(fin):
+            for document in squad:
+                # sample = json.loads(line.strip())
                 # 把json格式转换成python格式
-                if train:
-                    if len(sample['answer_spans']) == 0:
-                        continue
-                    # if sample['answer_spans'][0][1] >= self.max_p_len:
-                    if sample['answer_spans'][0][1] - \
-                            sample['answer_spans'][0][0] >= self.max_p_len:
-                        continue
+                # if train:
+                #     if len(sample['answer_spans']) == 0:
+                #         continue
+                #     # if sample['answer_spans'][0][1] >= self.max_p_len:
+                #     if sample['answer_spans'][0][1] - \
+                #             sample['answer_spans'][0][0] >= self.max_p_len:
+                #         continue
                     # 对容错的考虑
                     # 如果没有'answer_spans'或者answer_spans太长，该行数据就被舍弃了，
                     # 不放在training data中
 
-                if 'answer_docs' in sample:
-                    sample['answer_passages'] = sample['answer_docs']
+                # if 'answer_docs' in sample:
+                #     sample['answer_passages'] = sample['answer_docs']
                     # 重新命名
 
-                sample['question_tokens'] = sample['segmented_question']
-                # 重新命名
+                paragraphs = document['paragraphs']
 
-                sample['passages'] = []
-                for d_idx, doc in enumerate(sample['documents']):
-                    # 每一篇document都做这样的处理
-                    if train:
-                        most_related_para = doc['most_related_para']
-                        sample['passages'].append(
-                            {'passage_tokens':
-                             doc['segmented_paragraphs'][most_related_para],
-                             # 只保留最相关段落的token
-                             'is_selected': doc['is_selected']}
-                            # 记录该篇文章是否被问题回答者参考
-                        )
-                        # 只保留了最相关的段落，最相关的段落可能是由搜索技术确定的
-                    else:
-                        # 下面就实现了如何确定最相关的段落，而没有使用'most_related_para' tag
-                        para_infos = []
-                        # 储存了多个段落的信息
-                        for para_tokens in doc['segmented_paragraphs']:
-                            question_tokens = sample['segmented_question']
-                            common_with_question = Counter(
-                                para_tokens) & Counter(question_tokens)
-                            # intersection: 取共同的词，且按词频小的来
-                            # 这里表示的并不是位运算
-                            # https://docs.python.org/3/library/collections.html#collections.Counter
-                            correct_preds = sum(common_with_question.values())
-                            if correct_preds == 0:
-                                recall_wrt_question = 0
-                            else:
-                                recall_wrt_question = float(
-                                    correct_preds) / len(question_tokens)
-                                # 相同的词的平均词频
-                            para_infos.append(
-                                (para_tokens, recall_wrt_question,
-                                 len(para_tokens)))
-                        para_infos.sort(key=lambda x: (-x[1], x[2]))
-                        # 先按词频排（由大到小），再按长度排（由小到大）
-                        fake_passage_tokens = []
-                        for para_info in para_infos[:1]:
-                            # 如果有一个的话，就取出来，取的是词频最大的
-                            fake_passage_tokens += para_info[0]
-                            # 把para_tokens加进去
+                # if 'paragraphs' in document:
+                #     document['answer_passages'] = document['paragraphs']
 
-                        sample['passages'].append(
-                            {'passage_tokens': fake_passage_tokens})
-                        # 人工构造了fake_passage_tokens，其实就是把和问题最相关的
-                        # 段落的tokens拿了出来
-                data_set.append(sample)
-                # 把该行数据加入到data_set中
-            return data_set
+                for paragraph in paragraphs:
+                    context = paragraph['context']
+                    segmented_paragraphs = context.split()
+                    qas = paragraph['qas']
+                    for qa in qas:
+                        # sample['question_tokens'] = sample[
+                        #     'segmented_question']
+                        sample['question_tokens'] = qa['question'].split()
+                        question = ' '.join(qa['question'].split())
+                        answer = qa['answers'][0]['text']
+                        squad_id = len(all_answers)
+                        all_answers.append(
+                            [a['text'] for a in qa['answers']])
+                        answer_start = qa['answers'][0]['answer_start']
+                        answer_end = answer_start + len(answer)
+
+                        sample['passages'] = [
+                            {'passage_tokens': segmented_paragraphs,
+                             'is_selected': True}]
+
+                        sample['question'] = question
+                        sample['question_id'] = squad_id
+                        sample['answers'] = [answer]
+                        sample['answer_docs'] = [0]
+                        sample['answer_spans'] = [[answer_start, answer_end]]
+                        sample['fake_answers'] = sample['answers']
+                        sample['match_scores'] = [1.00]
+                        sample['segmented_answers'] = answer.split()
+
+                        data_set.append(sample)
+                        # 把该行数据加入到data_set中
+        return data_set
 
     def _one_mini_batch(self, data, indices, pad_id):
         """

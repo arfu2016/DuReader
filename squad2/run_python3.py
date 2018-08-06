@@ -117,18 +117,18 @@ def parse_args():
 
     path_settings.add_argument(
         '--train_files', nargs='+',
-        default=['../data/demo/trainset/search.train.json'],
+        default=['/decaNLP/.data/squad/train-v1.1.json'],
         help='list of files that contain the preprocessed train data')
     # nargs='+'表示--train_files之后可以有一个或者多个参数
 
     path_settings.add_argument(
         '--dev_files', nargs='+',
-        default=['../data/demo/devset/search.dev.json'],
+        default=['/decaNLP/.data/squad/dev-v1.1.json'],
         help='list of files that contain the preprocessed dev data')
 
     path_settings.add_argument(
         '--test_files', nargs='+',
-        default=['../data/demo/testset/search.test.json'],
+        default=['/decaNLP/.data/squad/dev-v1.1.json'],
         help='list of files that contain the preprocessed test data')
 
     path_settings.add_argument(
