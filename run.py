@@ -66,3 +66,5 @@ if __name__ == '__main__':
 # python mreading/run_python3.py --train --algo MLSTM --epochs 2 --batch_size 16
 # --train_files '../data/preprocessed/trainset/search.train.json'
 # --dev_files '../data/preprocessed/devset/search.dev.json'
+
+# python squad2/run_python3.py --prepare
