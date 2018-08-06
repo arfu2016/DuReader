@@ -153,7 +153,7 @@ def prepare(args):
     """
     checks data, creates the directories, prepare the vocabulary and embeddings
     """
-    logger = logging.getLogger("mreading.run_python3")
+    logger = logging.getLogger("squad2.run_python3")
     logger.info('Checking the data files...')
     for data_path in args.train_files + args.dev_files + args.test_files:
         assert os.path.exists(data_path), \
