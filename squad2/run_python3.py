@@ -8,7 +8,6 @@
 
 import argparse
 import json
-import logging
 import os
 import pickle
 import random
@@ -23,9 +22,9 @@ base_dir = os.path.dirname(
 
 try:
 
-    from mreading.dataset import BRCDataset
-    from mreading.vocab import Vocab
-    from mreading.rc_model import RCModel
+    from squad2.dataset import BRCDataset
+    from squad2.vocab import Vocab
+    from squad2.rc_model import RCModel
     from squad2.logger_setup import define_logger
 
 except ImportError:
@@ -36,9 +35,9 @@ except ImportError:
 
     from squad2.logger_setup import define_logger
 
-    module_dataset = import_module('.dataset', package='mreading')
-    module_vocab = import_module('.vocab', package='mreading')
-    module_rc_model = import_module('.rc_model', package='mreading')
+    module_dataset = import_module('.dataset', package='squad2')
+    module_vocab = import_module('.vocab', package='squad2')
+    module_rc_model = import_module('.rc_model', package='squad2')
 
     BRCDataset = getattr(module_dataset, 'BRCDataset')
     Vocab = getattr(module_vocab, 'Vocab')
