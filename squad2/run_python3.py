@@ -26,12 +26,15 @@ try:
     from mreading.dataset import BRCDataset
     from mreading.vocab import Vocab
     from mreading.rc_model import RCModel
+    from squad2.logger_setup import define_logger
 
 except ImportError:
 
     if base_dir not in sys.path:
         sys.path.insert(0, base_dir)
         # 以base_dir为基准开始导入
+
+    from squad2.logger_setup import define_logger
 
     module_dataset = import_module('.dataset', package='mreading')
     module_vocab = import_module('.vocab', package='mreading')
@@ -41,6 +44,7 @@ except ImportError:
     Vocab = getattr(module_vocab, 'Vocab')
     RCModel = getattr(module_rc_model, 'RCModel')
 
+logger = define_logger('squad2.run_python3')
 os.chdir(os.path.join(base_dir, 'squad2'))
 # 改变当前目录，因为后面要用到父目录，祖父目录
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
@@ -153,7 +157,6 @@ def prepare(args):
     """
     checks data, creates the directories, prepare the vocabulary and embeddings
     """
-    logger = logging.getLogger("squad2.run_python3")
     logger.info('Checking the data files...')
     for data_path in args.train_files + args.dev_files + args.test_files:
         assert os.path.exists(data_path), \
@@ -199,7 +202,7 @@ def train(args, restore=True):
     """
     trains the reading comprehension model
     """
-    logger = logging.getLogger("mreading.run_python3")
+
     logger.info('Load data_set and vocab...')
     with open(os.path.join(args.vocab_dir, 'vocab.data'), 'rb') as fin:
         vocab = pickle.load(fin)
@@ -240,7 +243,7 @@ def evaluate(args):
     evaluate the trained model on dev files
     在改变超参数时可以参考
     """
-    logger = logging.getLogger("brc")
+
     logger.info('Load data_set and vocab...')
     with open(os.path.join(args.vocab_dir, 'vocab.data'), 'rb') as fin:
         vocab = pickle.load(fin)
@@ -272,7 +275,7 @@ def predict(args):
     """
     predicts answers for test files
     """
-    logger = logging.getLogger("brc")
+
     logger.info('Load data_set and vocab...')
     with open(os.path.join(args.vocab_dir, 'vocab.data'), 'rb') as fin:
         vocab = pickle.load(fin)
@@ -317,22 +320,6 @@ def run():
     Prepares and runs the whole system.
     """
     args = parse_args()
-
-    logger = logging.getLogger("mreading.run_python3")
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s')
-    if args.log_path:
-        file_handler = logging.FileHandler(args.log_path)
-        # 会通过命令行传进来args.log_path，或者用默认值
-        file_handler.setLevel(logging.INFO)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-    else:
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
 
     logger.info('Running with args : {}'.format(args))
 
