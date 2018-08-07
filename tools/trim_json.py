@@ -16,8 +16,8 @@ valid_data = dict()
 with open(file_name, encoding='utf-8') as fin:
     squad = json.load(fin)['data']
     print(type(squad))
-    train_data['data'] = squad[0:100]
-    valid_data['data'] = squad[100:200]
+    train_data['data'] = squad[0:5]
+    valid_data['data'] = squad[5:10]
 
 with open(train_file, 'w', encoding='utf-8') as fout:
     json.dump(train_data, fout)
