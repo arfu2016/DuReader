@@ -101,6 +101,7 @@ class Vocab:
         """
         token = token.lower() if self.lower else token
         # 是否都转成小写字母
+        logger.debug(token)
         if token in self.token2id:
             idx = self.token2id[token]
         else:
