@@ -128,6 +128,7 @@ class BRCDataset:
 
                         sample['question'] = question
                         sample['question_id'] = squad_id
+                        sample['question_type'] = "DESCRIPTION"
                         sample['answers'] = [answer]
                         sample['answer_docs'] = [0]
                         sample['answer_spans'] = [[answer_start, answer_end]]
