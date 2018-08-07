@@ -176,6 +176,7 @@ def prepare(args):
     for word in brc_data.word_iter('train'):
         # we yield words from a generator
         vocab.add(word)
+        logger.debug(word)
 
     unfiltered_vocab_size = vocab.size()
     vocab.filter_tokens_by_cnt(min_cnt=2)
