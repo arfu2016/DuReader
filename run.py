@@ -69,3 +69,4 @@ if __name__ == '__main__':
 
 # python squad2/run_python3.py --prepare
 # python squad2/run_python3.py --train --algo MLSTM --epochs 1 --batch_size 16
+# python squad2/run_python3.py --train --algo MLSTM --epochs 1 --batch_size 32
