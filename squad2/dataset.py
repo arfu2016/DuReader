@@ -11,6 +11,7 @@ import logging
 from collections import Counter
 
 import numpy as np
+from nltk.tokenize import word_tokenize
 from .logger_setup import define_logger
 logger = define_logger('squad2.dataset')
 
@@ -103,14 +104,16 @@ class BRCDataset:
                     # 每次把sample bound到一个新的字典上，不要去修改原来的对象
 
                     context = paragraph['context']
-                    segmented_paragraphs = context.split()
-                    # todo: revise
+                    # segmented_paragraphs = context.split()
+                    segmented_paragraphs = word_tokenize(context)
+                    # todo_finished: revise
                     qas = paragraph['qas']
                     for qa in qas:
                         # sample['question_tokens'] = sample[
                         #     'segmented_question']
-                        sample['question_tokens'] = qa['question'].split()
-                        # todo: revise
+                        sample['question_tokens'] = word_tokenize(
+                            qa['question'])
+                        # todo_finished: revise
                         question = ' '.join(qa['question'].split())
                         answer = qa['answers'][0]['text']
                         squad_id = len(all_answers)
@@ -128,8 +131,11 @@ class BRCDataset:
                         sample['answers'] = [answer]
                         sample['answer_docs'] = [0]
                         sample['answer_spans'] = [[answer_start, answer_end]]
-                        sample['fake_answers'] = sample['answers']
-                        # todo: revise
+                        fake_answer = sample[
+                            'passages'][0]['passage_tokens'][
+                                answer_start: answer_end]
+                        sample['fake_answers'] = [fake_answer]
+                        # todo_finished: revise
                         sample['match_scores'] = [1.00]
                         sample['segmented_answers'] = answer.split()
 
