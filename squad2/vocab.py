@@ -105,8 +105,8 @@ class Vocab:
         logger.debug(len(self.token2id))
         if token in self.token2id:
             idx = self.token2id[token]
-            logger.debug(token)
-            logger.debug(idx)
+            # logger.debug(token)
+            # logger.debug(idx)
         else:
             idx = len(self.id2token)
             # idx的赋值, index

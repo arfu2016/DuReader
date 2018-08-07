@@ -67,9 +67,9 @@ class BRCDataset:
             data_path: the data file to load
         """
         logger.debug(data_path)
+        data_set, all_answers = [], []
+        # 放在with模块外面，不要做成with的局部变量
         with open(data_path, encoding='utf-8') as fin:
-            data_set, all_answers = [], []
-            sample = dict()
 
             logger.debug('Begin to load data from json file...')
             squad = json.load(fin)['data']
@@ -99,13 +99,18 @@ class BRCDataset:
                 #     document['answer_passages'] = document['paragraphs']
 
                 for paragraph in paragraphs:
+                    sample = dict()
+                    # 每次把sample bound到一个新的字典上，不要去修改原来的对象
+
                     context = paragraph['context']
                     segmented_paragraphs = context.split()
+                    # todo: revise
                     qas = paragraph['qas']
                     for qa in qas:
                         # sample['question_tokens'] = sample[
                         #     'segmented_question']
                         sample['question_tokens'] = qa['question'].split()
+                        # todo: revise
                         question = ' '.join(qa['question'].split())
                         answer = qa['answers'][0]['text']
                         squad_id = len(all_answers)
@@ -124,6 +129,7 @@ class BRCDataset:
                         sample['answer_docs'] = [0]
                         sample['answer_spans'] = [[answer_start, answer_end]]
                         sample['fake_answers'] = sample['answers']
+                        # todo: revise
                         sample['match_scores'] = [1.00]
                         sample['segmented_answers'] = answer.split()
 
