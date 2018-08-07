@@ -28,7 +28,7 @@ class RCModel:
     def __init__(self, vocab, args):
 
         # logging
-        logger = logging.getLogger("mreading.rc_model")
+        logger = logging.getLogger("squad2.rc_model")
         logger.setLevel(logging.DEBUG)
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s')

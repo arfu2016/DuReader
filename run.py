@@ -68,3 +68,4 @@ if __name__ == '__main__':
 # --dev_files '../data/preprocessed/devset/search.dev.json'
 
 # python squad2/run_python3.py --prepare
+# python squad2/run_python3.py --train --algo MLSTM --epochs 1 --batch_size 16
