@@ -110,7 +110,7 @@ class Vocab:
         else:
             idx = len(self.id2token)
             # idx的赋值, index
-            logger.debug(idx)
+            # logger.debug(idx)
             self.id2token[idx] = token
             self.token2id[token] = idx
         if cnt > 0:
