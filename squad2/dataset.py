@@ -174,6 +174,7 @@ class BRCDataset:
         Returns:
             one batch of data
         """
+        logger.debug(indices)
         batch_data = {'raw_data': [data[i] for i in indices],
                       'question_token_ids': [],
                       'question_length': [],
