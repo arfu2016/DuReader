@@ -125,7 +125,7 @@ class BRCDataset:
                         sample['passages'] = [
                             {'passage_tokens': segmented_paragraphs,
                              'is_selected': True}]
-                        logger.debug(sample['passages'][0]['passage_tokens'])
+                        # logger.debug(sample['passages'][0]['passage_tokens'])
 
                         sample['question'] = question
                         sample['question_id'] = squad_id
@@ -135,9 +135,10 @@ class BRCDataset:
                         sample['answer_docs'] = [0]
                         sample['answer_spans'] = [[answer_start, answer_end]]
                         logger.debug(sample['answer_spans'])
-                        fake_answer = sample[
-                            'passages'][0]['passage_tokens'][
-                                answer_start: answer_end]
+                        # fake_answer = sample[
+                        #     'passages'][0]['passage_tokens'][
+                        #         answer_start: answer_end]
+                        fake_answer = context[answer_start: answer_end]
                         sample['fake_answers'] = [fake_answer]
                         logger.debug(sample['fake_answers'])
                         # todo_finished: revise
