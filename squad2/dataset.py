@@ -184,8 +184,8 @@ class BRCDataset:
                       'end_id': []}
         # 这里用来对语料做标记，主要是标记start_id和end_id
 
-        for sample in batch_data['raw_data']:
-            logger.debug(sample['question'])
+        # for sample in batch_data['raw_data']:
+        #     logger.debug(sample['question'])
         max_passage_num = max(
             [len(sample['passages']) for sample in batch_data['raw_data']])
         # 这一批数据中段落数目最大的样本
@@ -330,7 +330,9 @@ class BRCDataset:
             raise NotImplementedError(
                 'No data set named as {}'.format(set_name))
         data_size = len(data)
-        # logger.debug(data_size)
+        for sample in data:
+            logger.debug(sample['question'])
+        logger.debug(data_size)
         indices = np.arange(data_size)
         # 是所有data的index
         if shuffle:
