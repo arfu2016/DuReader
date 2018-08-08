@@ -296,6 +296,7 @@ class RCModel:
             self.logger.debug(batch['passage_token_ids'])
             self.logger.debug(batch['passage_length'])
             self.logger.debug(batch['start_id'])
+            self.logger.debug(batch['end_id'])
             self.logger.debug(
                 self.sess.run(tf.shape(self.start_probs), feed_dict))
 

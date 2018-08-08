@@ -132,7 +132,7 @@ class BRCDataset:
                         sample['question_type'] = "DESCRIPTION"
                         sample['answers'] = [answer]
                         # logger.debug(sample['answers'])
-                        sample['answer_docs'] = [0]
+                        sample['answer_passages'] = [0]
                         sample['answer_spans'] = [[answer_start, answer_end]]
                         # logger.debug(sample['answer_spans'])
                         # fake_answer = sample[
