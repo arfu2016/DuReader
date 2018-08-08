@@ -150,7 +150,7 @@ class BRCDataset:
                             'passages'][0]['passage_tokens'][
                                 word_start: word_end]
                         fake_answer2 = context[answer_start: answer_end]
-                        sample['fake_answers'] = [fake_answer]
+                        sample['fake_answers'] = [' '.join(fake_answer)]
                         logger.debug(sample['fake_answers'])
                         logger.debug(fake_answer2)
                         # todo_finished: revise
