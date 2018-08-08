@@ -418,11 +418,13 @@ class RCModel:
                                          'answers': [best_answer],
                                          'entity_answers': [[]],
                                          'yesno_answers': []})
-                if 'answers' in sample:
+                # if 'answers' in sample:
+                if 'fake_answers' in sample:
                     ref_answers.append({'question_id': sample['question_id'],
                                         'question_type':
                                             sample['question_type'],
-                                        'answers': sample['answers'],
+                                        # 'answers': sample['answers'],
+                                        'answers': sample['fake_answers'],
                                         'entity_answers': [[]],
                                         'yesno_answers': []})
 
@@ -482,7 +484,7 @@ class RCModel:
         if best_p_idx is None or best_span is None:
             best_answer = ''
         else:
-            best_answer = ''.join(
+            best_answer = ' '.join(
                 sample['passages'][best_p_idx]['passage_tokens'][
                     best_span[0]: best_span[1] + 1])
             # best_span就是个2个元素的向量
