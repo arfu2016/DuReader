@@ -15,7 +15,7 @@ train_data = dict()
 valid_data = dict()
 with open(file_name, encoding='utf-8') as fin:
     squad = json.load(fin)['data']
-    print(type(squad))
+    # print(type(squad))
     train_data['data'] = squad[0:2]
     valid_data['data'] = squad[2:4]
 

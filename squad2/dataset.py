@@ -130,7 +130,7 @@ class BRCDataset:
                         # logger.debug(sample['passages'][0]['passage_tokens'])
 
                         sample['question'] = question
-                        # logger.debug(sample['question'])
+                        logger.debug(sample['question'])
                         sample['question_id'] = squad_id
                         sample['question_type'] = "DESCRIPTION"
                         sample['answers'] = [answer]
@@ -330,8 +330,8 @@ class BRCDataset:
             raise NotImplementedError(
                 'No data set named as {}'.format(set_name))
         data_size = len(data)
-        for sample in data:
-            logger.debug(sample['question'])
+        # for sample in data:
+        #     logger.debug(sample['question'])
         logger.debug(data_size)
         indices = np.arange(data_size)
         # 是所有data的index
