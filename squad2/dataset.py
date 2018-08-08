@@ -58,8 +58,8 @@ class BRCDataset:
         if test_files:
             for test_file in test_files:
                 self.test_set += self._load_dataset(test_file)
-            for sample in self.test_set:
-                logger.debug(sample['question'])
+            # for sample in self.test_set:
+            #     logger.debug(sample['question'])
             self.logger.info(
                 'Test set size: {} questions.'.format(len(self.test_set)))
 
