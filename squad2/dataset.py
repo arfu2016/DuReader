@@ -108,12 +108,13 @@ class BRCDataset:
                     segmented_paragraphs = word_tokenize(context)
                     # todo_finished: revise
                     qas = paragraph['qas']
-                    logger.debug(qas)
+
                     for qa in qas:
                         # sample['question_tokens'] = sample[
                         #     'segmented_question']
                         sample['question_tokens'] = word_tokenize(
                             qa['question'])
+                        logger.debug(qa['question'])
                         # todo_finished: revise
                         question = ' '.join(sample['question_tokens'])
                         answer = qa['answers'][0]['text']
