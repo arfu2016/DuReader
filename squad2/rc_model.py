@@ -401,6 +401,8 @@ class RCModel:
             # 也就是第一个样本
 
             self.logger.info(len(batch['raw_data']))
+            self.logger.info(len(start_probs))
+            self.logger.info(len(end_probs))
             for sample, start_prob, end_prob in zip(batch['raw_data'],
                                                     start_probs, end_probs):
 
