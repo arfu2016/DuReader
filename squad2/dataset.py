@@ -131,16 +131,16 @@ class BRCDataset:
                         sample['question_id'] = squad_id
                         sample['question_type'] = "DESCRIPTION"
                         sample['answers'] = [answer]
-                        logger.debug(sample['answers'])
+                        # logger.debug(sample['answers'])
                         sample['answer_docs'] = [0]
                         sample['answer_spans'] = [[answer_start, answer_end]]
-                        logger.debug(sample['answer_spans'])
+                        # logger.debug(sample['answer_spans'])
                         # fake_answer = sample[
                         #     'passages'][0]['passage_tokens'][
                         #         answer_start: answer_end]
                         fake_answer = context[answer_start: answer_end]
                         sample['fake_answers'] = [fake_answer]
-                        logger.debug(sample['fake_answers'])
+                        # logger.debug(sample['fake_answers'])
                         # todo_finished: revise
                         sample['match_scores'] = [1.00]
                         sample['segmented_answers'] = answer.split()
