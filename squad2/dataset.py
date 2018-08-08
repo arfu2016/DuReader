@@ -132,7 +132,7 @@ class BRCDataset:
                         # logger.debug(sample['passages'][0]['passage_tokens'])
 
                         sample['question'] = question
-                        # logger.debug(sample['question'])
+                        logger.debug(sample['question'])
                         sample['question_id'] = squad_id
                         sample['question_type'] = "DESCRIPTION"
                         sample['answers'] = [answer]
@@ -165,8 +165,7 @@ class BRCDataset:
                         data_set.append(sample)
                         # 把该行数据加入到data_set中
 
-        print('line 166')
-        for sample in data_set:
+        for sample in data_set[-10:]:
             logger.debug(sample['question'])
 
         return data_set
