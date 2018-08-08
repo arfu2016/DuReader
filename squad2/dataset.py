@@ -58,6 +58,8 @@ class BRCDataset:
         if test_files:
             for test_file in test_files:
                 self.test_set += self._load_dataset(test_file)
+            for sample in self.test_set:
+                logger.debug(sample['question'])
             self.logger.info(
                 'Test set size: {} questions.'.format(len(self.test_set)))
 
@@ -163,6 +165,7 @@ class BRCDataset:
                         data_set.append(sample)
                         # 把该行数据加入到data_set中
 
+        print('line 166')
         for sample in data_set:
             logger.debug(sample['question'])
 
@@ -178,7 +181,7 @@ class BRCDataset:
         Returns:
             one batch of data
         """
-        logger.debug(indices)
+        # logger.debug(indices)
         batch_data = {'raw_data': [data[i] for i in indices],
                       'question_token_ids': [],
                       'question_length': [],
