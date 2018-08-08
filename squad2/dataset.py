@@ -102,8 +102,6 @@ class BRCDataset:
                 #     document['answer_passages'] = document['paragraphs']
 
                 for paragraph in paragraphs:
-                    sample = dict()
-                    # 每次把sample bound到一个新的字典上，不要去修改原来的对象
 
                     context = paragraph['context']
                     # segmented_paragraphs = context.split()
@@ -112,6 +110,8 @@ class BRCDataset:
                     qas = paragraph['qas']
 
                     for qa in qas:
+                        sample = dict()
+                        # 每次把sample bound到一个新的字典上，不要去修改原来的对象
                         # sample['question_tokens'] = sample[
                         #     'segmented_question']
                         sample['question_tokens'] = word_tokenize(
