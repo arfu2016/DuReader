@@ -293,12 +293,12 @@ class RCModel:
             #     self.sess.run(
             #         tf.shape(self.no_dup_question_encodes), feed_dict))
 
-            self.logger.debug(batch['passage_token_ids'])
-            self.logger.debug(batch['passage_length'])
-            self.logger.debug(batch['start_id'])
-            self.logger.debug(batch['end_id'])
-            self.logger.debug(
-                self.sess.run(tf.shape(self.start_probs), feed_dict))
+            # self.logger.debug(batch['passage_token_ids'])
+            # self.logger.debug(batch['passage_length'])
+            # self.logger.debug(batch['start_id'])
+            # self.logger.debug(batch['end_id'])
+            # self.logger.debug(
+            #     self.sess.run(tf.shape(self.start_probs), feed_dict))
 
             _, loss = self.sess.run([self.train_op, self.loss], feed_dict)
             # variable自动更新，返回的也是更新后的variable，这里就不记录了

@@ -326,10 +326,12 @@ class BRCDataset:
             raise NotImplementedError(
                 'No data set named as {}'.format(set_name))
         data_size = len(data)
+        logger.debug(data_size)
         indices = np.arange(data_size)
         # 是所有data的index
         if shuffle:
             np.random.shuffle(indices)
         for batch_start in np.arange(0, data_size, batch_size):
             batch_indices = indices[batch_start: batch_start + batch_size]
+            logger.debug(batch_indices)
             yield self._one_mini_batch(data, batch_indices, pad_id)
