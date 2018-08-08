@@ -125,6 +125,7 @@ class BRCDataset:
                         sample['passages'] = [
                             {'passage_tokens': segmented_paragraphs,
                              'is_selected': True}]
+                        logger.debug(sample['passages'][0]['passage_tokens'])
 
                         sample['question'] = question
                         sample['question_id'] = squad_id
