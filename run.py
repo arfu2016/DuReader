@@ -82,7 +82,7 @@ if __name__ == '__main__':
 # --dev_files '/home/projects/DuReader/data/demo_squad/valid_demo.json'
 # --test_files '/home/projects/DuReader/data/demo_squad/valid_demo.json'
 
-# python squad2/run_python3.py --predict --algo MLSTM --batch_size 32
+# python squad2/run_python3.py --predict --algo MLSTM  --epochs 1 --batch_size 32
 # --train_files '/home/projects/DuReader/data/demo_squad/train_demo.json'
 # --dev_files '/home/projects/DuReader/data/demo_squad/valid_demo.json'
 # --test_files '/home/projects/DuReader/data/demo_squad/valid_demo.json'

@@ -338,7 +338,7 @@ class BRCDataset:
         data_size = len(data)
         # for sample in data:
         #     logger.debug(sample['question'])
-        logger.debug(data_size)
+        # logger.debug(data_size)
         indices = np.arange(data_size)
         # 是所有data的index
         if shuffle:
