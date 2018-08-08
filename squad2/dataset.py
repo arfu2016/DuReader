@@ -133,14 +133,26 @@ class BRCDataset:
                         sample['answers'] = [answer]
                         # logger.debug(sample['answers'])
                         sample['answer_passages'] = [0]
-                        sample['answer_spans'] = [[answer_start, answer_end]]
+
+                        word_start = len(word_tokenize(context[:answer_start]))
+                        word_end = word_start + len(
+                            word_tokenize(context[answer_start: answer_end]))
+
+                        word_position = dict()
+                        p_idx = 0
+                        for idx, word in enumerate(segmented_paragraphs):
+                            word_position[idx] = p_idx
+                            p_idx += len(word)
+
+                        sample['answer_spans'] = [[word_start, word_end]]
                         # logger.debug(sample['answer_spans'])
-                        # fake_answer = sample[
-                        #     'passages'][0]['passage_tokens'][
-                        #         answer_start: answer_end]
-                        fake_answer = context[answer_start: answer_end]
+                        fake_answer = sample[
+                            'passages'][0]['passage_tokens'][
+                                word_start: word_end]
+                        fake_answer2 = context[answer_start: answer_end]
                         sample['fake_answers'] = [fake_answer]
-                        # logger.debug(sample['fake_answers'])
+                        logger.debug(sample['fake_answers'])
+                        logger.debug(fake_answer2)
                         # todo_finished: revise
                         sample['match_scores'] = [1.00]
                         sample['segmented_answers'] = answer.split()
