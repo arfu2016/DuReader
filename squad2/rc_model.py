@@ -406,7 +406,7 @@ class RCModel:
 
                 best_answer = self.find_best_answer(sample, start_prob,
                                                     end_prob, padded_p_len)
-                self.logger.info(sample['question_tokens'])
+                self.logger.info(sample['question'])
                 self.logger.info(best_answer)
                 # 在做evaluate和test的推测工作时，要这样利用start_prob和end_prob
                 if save_full_info:
