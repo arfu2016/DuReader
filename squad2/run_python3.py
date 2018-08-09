@@ -314,7 +314,7 @@ def predict(args):
                                         ))
         answer_samples = random.sample(question_answer, 20)  # 10
         for sample in answer_samples:
-            answer_string += '{}: \nPredict: {}\nReal: {}'.format(
+            answer_string += '{}: \nPredict: {}\nReal: {}\n'.format(
                 sample[0], sample[1], sample[2])
         logger.info(answer_string)
 
