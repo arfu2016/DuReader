@@ -379,6 +379,7 @@ class RCModel:
             raw sample and saved
         """
         pred_answers, ref_answers = [], []
+        pred_refs = []
         total_loss, total_num = 0, 0
         for b_itx, batch in enumerate(eval_batches):
             feed_dict = {self.p: batch['passage_token_ids'],
@@ -432,11 +433,19 @@ class RCModel:
                                         'entity_answers': [[]],
                                         'yesno_answers': []})
 
+                pred_refs.append({
+                                 'question': sample['question'],
+                                 'predict_answer': best_answer,
+                                 'real_answer': sample['fake_answers'],
+
+                })
+
         if result_dir is not None and result_prefix is not None:
             result_file = os.path.join(result_dir, result_prefix + '.json')
             with open(result_file, 'w', encoding='utf8') as fout:
-                for pred_answer in pred_answers:
-                    fout.write(json.dumps(pred_answer,
+                # for pred_answer in pred_answers:
+                for pred_ref in pred_refs:
+                    fout.write(json.dumps(pred_ref,  # pred_answer
                                           ensure_ascii=False) + '\n')
 
             self.logger.info(

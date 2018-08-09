@@ -143,11 +143,11 @@ class BRCDataset:
                         word_end = word_start + len(
                             word_tokenize(context[answer_start: answer_end]))
 
-                        word_position = dict()
-                        p_idx = 0
-                        for idx, word in enumerate(segmented_paragraphs):
-                            word_position[idx] = p_idx
-                            p_idx += len(word)
+                        # word_position = dict()
+                        # p_idx = 0
+                        # for idx, word in enumerate(segmented_paragraphs):
+                        #     word_position[idx] = p_idx
+                        #     p_idx += len(word)
 
                         sample['answer_spans'] = [[word_start, word_end]]
                         # logger.debug(sample['answer_spans'])
@@ -160,7 +160,8 @@ class BRCDataset:
                         # logger.debug(fake_answer2)
                         # todo_finished: revise
                         sample['match_scores'] = [1.00]
-                        sample['segmented_answers'] = answer.split()
+                        # sample['segmented_answers'] = answer.split()
+                        sample['segmented_answers'] = word_tokenize(answer)
 
                         data_set.append(sample)
                         # 把该行数据加入到data_set中

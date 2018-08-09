@@ -309,10 +309,13 @@ def predict(args):
             for line in fin:
                 answer_dict = json.loads(line.strip())
                 question_answer.append((answer_dict['question'],
-                                        answer_dict['answers']))
-        answer_samples = random.sample(question_answer, 10)
+                                        answer_dict['predict_answer'],
+                                        answer_dict['real_answers'],
+                                        ))
+        answer_samples = random.sample(question_answer, 20)  # 10
         for sample in answer_samples:
-            answer_string += '{}: {}\n'.format(sample[0], sample[1])
+            answer_string += '{}: \nPredict: {}\nReal: {}'.format(
+                sample[0], sample[1], sample[2])
         logger.info(answer_string)
 
 
