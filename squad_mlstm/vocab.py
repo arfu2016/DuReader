@@ -8,7 +8,7 @@
 
 import numpy as np
 from .logger_setup import define_logger
-logger = define_logger('squad2.vocab')
+logger = define_logger('squad_mlstm.vocab')
 
 
 class Vocab:

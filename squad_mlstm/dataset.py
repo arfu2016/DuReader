@@ -7,13 +7,11 @@
 """
 
 import json
-import logging
-from collections import Counter
 
 import numpy as np
 from nltk.tokenize import word_tokenize
 from .logger_setup import define_logger
-logger = define_logger('squad2.dataset')
+logger = define_logger('squad_mlstm.dataset')
 
 
 class BRCDataset:
