@@ -373,8 +373,8 @@ class RCModel:
         """
         total_num, total_loss = 0, 0
         # 这一个epoch中总共训练了多少样本
-        # log_every_n_batch, n_batch_loss = 50, 0
-        log_every_n_batch, n_batch_loss = 30, 0
+        log_every_n_batch, n_batch_loss = 50, 0
+        # log_every_n_batch, n_batch_loss = 30, 0
 
         for bitx, batch in enumerate(train_batches, 1):
             # print('bitx in rc_model.py', bitx)
@@ -444,7 +444,7 @@ class RCModel:
             # loss是根据batch size平均后的结果，这里进行加总
             total_num += len(batch['raw_data'])
             # 累加batch size，或者最后一批剩下的数目
-            print('total_num in rc_model.py', total_num)
+            # print('total_num in rc_model.py', total_num)
             n_batch_loss += loss
             if log_every_n_batch > 0 and bitx % log_every_n_batch == 0:
                 self.logger.info(
