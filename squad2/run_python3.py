@@ -310,7 +310,7 @@ def predict(args):
                 answer_dict = json.loads(line.strip())
                 question_answer.append((answer_dict['question'],
                                         answer_dict['predict_answer'],
-                                        answer_dict['real_answers'],
+                                        answer_dict['real_answer'],
                                         ))
         answer_samples = random.sample(question_answer, 20)  # 10
         for sample in answer_samples:
