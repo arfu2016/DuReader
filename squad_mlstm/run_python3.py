@@ -22,10 +22,10 @@ base_dir = os.path.dirname(
 
 try:
 
-    from squad2.dataset import BRCDataset
-    from squad2.vocab import Vocab
-    from squad2.rc_model import RCModel
-    from squad2.logger_setup import define_logger
+    from squad_mlstm.dataset import BRCDataset
+    from squad_mlstm.vocab import Vocab
+    from squad_mlstm.rc_model import RCModel
+    from squad_mlstm.logger_setup import define_logger
 
 except ImportError:
 
@@ -33,18 +33,18 @@ except ImportError:
         sys.path.insert(0, base_dir)
         # 以base_dir为基准开始导入
 
-    from squad2.logger_setup import define_logger
+    from squad_mlstm.logger_setup import define_logger
 
-    module_dataset = import_module('.dataset', package='squad2')
-    module_vocab = import_module('.vocab', package='squad2')
-    module_rc_model = import_module('.rc_model', package='squad2')
+    module_dataset = import_module('.dataset', package='squad_mlstm')
+    module_vocab = import_module('.vocab', package='squad_mlstm')
+    module_rc_model = import_module('.rc_model', package='squad_mlstm')
 
     BRCDataset = getattr(module_dataset, 'BRCDataset')
     Vocab = getattr(module_vocab, 'Vocab')
     RCModel = getattr(module_rc_model, 'RCModel')
 
-logger = define_logger('squad2.run_python3')
-os.chdir(os.path.join(base_dir, 'squad2'))
+logger = define_logger('squad_mlstm.run_python3')
+os.chdir(os.path.join(base_dir, 'squad_mlstm'))
 # 改变当前目录，因为后面要用到父目录，祖父目录
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 # 设置环境变量，控制tensorflow的log level
