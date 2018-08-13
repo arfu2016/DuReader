@@ -35,7 +35,9 @@ def plot_similarity(labels, features, rotation):
 
 
 def get_features(labels):
-    base_dir = os.path.dirname(os.path.dirname(__file__))
+    base_dir = os.path.dirname(
+        os.path.dirname(
+            os.path.dirname(__file__)))
     embed = hub.Module(os.path.join(base_dir,
                                     'tf-hub2/data/universal-sentence-encoder'))
     similarity_input_placeholder = tf.placeholder(tf.string, shape=(None,))

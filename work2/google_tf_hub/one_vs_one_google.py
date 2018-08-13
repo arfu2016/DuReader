@@ -61,7 +61,9 @@ def cal_similarity_score(sts_dev):
     # 一维向量，元素个数不限；矩阵处理可以并行，速度上胜过for循环
     sts_input2 = tf.placeholder(tf.string, shape=(None,))
 
-    base_dir = os.path.dirname(os.path.dirname(__file__))
+    base_dir = os.path.dirname(
+        os.path.dirname(
+            os.path.dirname(__file__)))
     embed = hub.Module(os.path.join(base_dir,
                                     'tf-hub2/data/universal-sentence-encoder'))
 

@@ -15,7 +15,9 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from cachetools import cached, TTLCache
 
-base_dir = os.path.dirname(os.path.dirname(__file__))
+base_dir = os.path.dirname(
+    os.path.dirname(
+        os.path.dirname(__file__)))
 embed = hub.Module(os.path.join(base_dir,
                                 'tf-hub2/data/universal-sentence-encoder'))
 cache = TTLCache(maxsize=100, ttl=300)
