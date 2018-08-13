@@ -90,3 +90,6 @@ if __name__ == '__main__':
 # python squad_mlstm/run_python3.py --prepare
 # python squad_mlstm/run_python3.py --train --algo MLSTM --epochs 1 --batch_size 32
 # python squad_mlstm/run_python3.py --predict --algo MLSTM --epochs 1 --batch_size 32
+
+# python squad_mlstm/run_python3.py --train --algo BIDAF --epochs 1 --batch_size 32
+# python squad_mlstm/run_python3.py --predict --algo BIDAF --epochs 1 --batch_size 32
