@@ -1,0 +1,14 @@
+2018-06-21 15:42:29,790 - add_dongqiudi.py - INFO - There are 212 records in dongqiudi index
+2018-06-21 15:42:50,315 - add_dongqiudi.py - INFO - There are 212 records in dongqiudi index
+2018-06-21 18:24:00,594 - add_dongqiudi.py - INFO - There are 211 records in dongqiudi index
+2018-06-22 13:17:11,027 - add_dongqiudi.py - INFO - There are 411 records in dongqiudi index
+2018-06-22 13:34:25,840 - add_dongqiudi.py - INFO - There are 411 records in dongqiudi index
+2018-06-22 14:17:34,775 - dongqiudi_two_gram.py - INFO - There are 411 records in dongqiudi index
+2018-06-22 14:36:15,178 - dongqiudi_two_gram.py - INFO - There are 411 records in dongqiudi index
+2018-06-22 14:53:11,222 - dongqiudi_two_gram.py - INFO - There are 411 records in dongqiudi index
+2018-06-22 14:56:18,366 - dongqiudi_two_gram.py - INFO - There are 411 records in dongqiudi index
+2018-06-22 15:03:50,419 - dongqiudi_two_gram.py - INFO - There are 411 records in dongqiudi index
+2018-06-22 15:04:45,101 - dongqiudi_two_gram.py - INFO - There are 411 records in dongqiudi index
+2018-06-22 15:13:13,330 - dongqiudi_two_keys.py - INFO - There are 411 records in dongqiudi index
+2018-08-14 17:49:25,512 - add_dongqiudi.py - INFO - There are 411 records in dongqiudi index
+2018-08-14 17:54:52,593 - add_dongqiudi.py - INFO - There are 671 records in dongqiudi index
