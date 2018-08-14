@@ -20,7 +20,8 @@ from work2.logger_setup import define_logger
 
 base_dir = os.path.dirname(
     os.path.dirname(
-        os.path.dirname(__file__)))
+        os.path.dirname(
+            os.path.abspath(__file__))))
 cache = TTLCache(maxsize=100, ttl=300)
 logger = define_logger('work2.one_vs_group_spacy_concat')
 

@@ -94,6 +94,7 @@ def most_similar(training_sentences: tuple, test_sentence: tuple) -> str:
     print(
         'time to get sentence vector: {:.3f}'.format(
             time.perf_counter()-start))
+    # 2.644s in 172.16.1.60
     sim_scores = _similarity_scores(training_embeddings, test_embedding)
     print('sim_scores:')
     formatted_sim_scores = [float('{:.3f}'.format(value))
