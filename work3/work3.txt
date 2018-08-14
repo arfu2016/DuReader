@@ -1,0 +1,46 @@
+squad 1.1 training dataset: 87599 questions
+squad 1.1 validation dataset: 10570 questions
+
+algorithm: BIDAF 完整模型
+epochs: 1
+batch size: 32
+No pretrained word embeddings
+python squad_mlstm/run_python3.py --train --algo BIDAF --epochs 1 --batch_size 32
+There are 32,880,003 parameters in the model
+
+Result:
+time: 1.5小时
+'Bleu-1': 0.1347
+'Bleu-4': 0.0823
+'Rouge-L': 0.338
+
+algorithm: MLSTM 完整模型
+epochs: 1
+batch size: 32
+No pretrained word embeddings
+python squad_mlstm/run_python3.py --train --algo MLSTM --epochs 1 --batch_size 32
+There are 33,647,105 parameters in the model
+
+Result:
+time: 2.5小时
+'Bleu-1': 0.149
+'Bleu-4': 0.0885
+'Rouge-L': 0.345
+
+algorithm: decanlp
+epochs: 8000 (iterations: 8000)
+batch size: 128 (查代码后发现，train所用的batch size与validation相同); validation batch size: 128
+With pretrained word embeddings
+python decaNLP/train.py --train_tasks squad --gpus 0 --train_batch_tokens 5000 --val_batch_size 128
+There are 14,469,902 parameters in the model
+
+Result:
+time: 1小时（1个gpu）
+'Bleu-1': 0.525
+'Bleu-4': 0.329
+'Rouge-L': 0.493
+
+time: 3.5小时（1个gpu）
+'Bleu-1': 0.643
+'Bleu-4': 0.500
+'Rouge-L': 0.636
