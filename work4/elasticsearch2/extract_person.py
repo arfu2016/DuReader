@@ -201,6 +201,8 @@ def search_data_match():
 
     pprint.pprint(person_info)
 
+    return person_info
+
 
 def search_data_term():
     p = es.search(index="dongqiudi",
