@@ -93,3 +93,12 @@ if __name__ == '__main__':
 
 # python squad_mlstm/run_python3.py --train --algo BIDAF --epochs 1 --batch_size 32
 # python squad_mlstm/run_python3.py --predict --algo BIDAF --epochs 1 --batch_size 32
+
+# python run.py --prepare \
+# --train_files '../data/preprocessed/trainset/search.train.json' \
+# --dev_files '../data/preprocessed/devset/search.dev.json' \
+# --test_files '../data/demo/testset/search.test.json'
+
+# python run.py --train --algo BIDAF --epochs 1 --batch_size 32 \
+# --train_files '../data/preprocessed/trainset/search.train.json' \
+# --dev_files '../data/preprocessed/devset/search.dev.json'
