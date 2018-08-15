@@ -367,15 +367,15 @@ if __name__ == '__main__':
 
     # search_data_term()
 
-    search_data_match()
+    # search_data_match()
 
     # ***********************************************
 
     # append_data()
 
-    # update_key_tags()
+    update_key_tags()
 
-    # count_data()
+    count_data()
 
     # ***********************************************
 

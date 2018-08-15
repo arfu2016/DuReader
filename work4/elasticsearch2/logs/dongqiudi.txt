@@ -12,3 +12,4 @@
 2018-06-22 15:13:13,330 - dongqiudi_two_keys.py - INFO - There are 411 records in dongqiudi index
 2018-08-14 17:49:25,512 - add_dongqiudi.py - INFO - There are 411 records in dongqiudi index
 2018-08-14 17:54:52,593 - add_dongqiudi.py - INFO - There are 671 records in dongqiudi index
+2018-08-15 10:16:38,752 - add_dongqiudi.py - INFO - There are 798 records in dongqiudi index
