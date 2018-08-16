@@ -19,8 +19,14 @@ import logging
 import os
 import gensim
 
-file_dir = os.path.dirname(os.path.abspath(__file__))
-fname = os.path.join(file_dir, 'data/word2vec_text8_google.model')
+base_dir = os.path.dirname(
+    os.path.dirname(
+        os.path.dirname(
+            os.path.abspath(__file__)
+        )
+    )
+)
+fname = os.path.join(base_dir, 'gensim2/data/word2vec_text8_google.model')
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
                     level=logging.INFO)
@@ -28,4 +34,4 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
 model = gensim.models.Word2Vec.load(fname)
 
 # Load evaluation dataset of analogy task
-model.accuracy(os.path.join(file_dir, 'data/questions-words.txt'))
+model.accuracy(os.path.join(base_dir, 'gensim2/data/questions-words.txt'))

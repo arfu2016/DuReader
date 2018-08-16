@@ -25,10 +25,19 @@ from gensim.models import word2vec
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
                     level=logging.INFO)
 
-sentences = word2vec.Text8Corpus("data/text8")
+base_dir = os.path.dirname(
+    os.path.dirname(
+        os.path.dirname(
+            os.path.abspath(__file__)
+        )
+    )
+)
+
+file_name = os.path.join(base_dir, "gensim2/data/text8")
+
+sentences = word2vec.Text8Corpus(file_name)
 
 model = gensim.models.Word2Vec(sentences, size=300, min_count=5, iter=6)
 
-file_dir = os.path.dirname(os.path.abspath(__file__))
-fname = os.path.join(file_dir, 'data/word2vec_text8.model')
+fname = os.path.join(base_dir, 'gensim2/data/word2vec_text8.model')
 model.save(fname)
