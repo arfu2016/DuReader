@@ -168,7 +168,8 @@ def most_similar(training_sentences: tuple, test_sentence: tuple) -> list:
     sentence_score = sorted(sentence_score, key=lambda x: x[1], reverse=True)
     # sentence_score[0:5]
     sentence_score = [
-        (sentence, score) for sentence, score in sentence_score if score > 0.75]
+        (sentence, score) for sentence, score in sentence_score
+        if score > 0.8]
     return sentence_score
 
 

@@ -371,7 +371,7 @@ if __name__ == '__main__':
 
     # ***********************************************
 
-    # append_data()
+    append_data()
 
     update_key_tags()
 
