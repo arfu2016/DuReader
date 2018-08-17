@@ -6,8 +6,6 @@
 @Desc      : 给出一组句子，找到其中和一个另给的句子最相似的句子
 """
 import os
-import pprint
-import string
 import time
 from concurrent.futures import ProcessPoolExecutor
 from io import StringIO
@@ -18,14 +16,14 @@ import gensim
 from cachetools import cached, TTLCache
 from gensim.models.word2vec import LineSentence
 
-from work2.logger_setup import define_logger
+from work4.logger_setup import define_logger
 
 base_dir = os.path.dirname(
     os.path.dirname(
         os.path.dirname(
             os.path.abspath(__file__))))
 cache = TTLCache(maxsize=100, ttl=300)
-logger = define_logger('work2.one_vs_group_spacy_concat')
+logger = define_logger('work4.similar_sentence.one_vs_group')
 
 
 # 把句子转换为向量
@@ -33,8 +31,11 @@ logger = define_logger('work2.one_vs_group_spacy_concat')
 def model_load():
     fn = os.path.join(base_dir, "wiki-word2vec/data/wiki.zh.model")
     model0 = gensim.models.Word2Vec.load(fn)
-    print('The model was loaded.')
+    logger.debug('The model was loaded.')
     return model0
+
+
+model = model_load()
 
 
 def avg_pooling(word_vectors: list) -> list:
@@ -61,17 +62,6 @@ def concat_pooling(word_vectors: list) -> list:
     return st_vector1
 
 
-# @cached(cache)
-# def _single_sentence(sentence: str) -> list:
-#     word_list = nlp(sentence)
-#     word_list = [word for word in word_list if word.text not in punc_set]
-#     # 去除句中的标点符号
-#     word_vectors = [word.vector for word in word_list
-#                     if word.has_vector]
-#     st_vector = concat_pooling(word_vectors)
-#
-#     return st_vector
-
 def file_generate(sts):
     seg_list = [' '.join(jieba.cut(st)) for st in sts]
     handle = StringIO('\n'.join(seg_list))
@@ -80,24 +70,16 @@ def file_generate(sts):
 
 @cached(cache)
 def _sentence_embedding(sentences: tuple) -> np.ndarray:
-    model = model_load()
     vocab_dict = model.wv.vocab
     # 是用去掉标点后的wiki训练的，所以vocab中没有标点符号
 
     st_vector_list = []
 
-    print('messages:')
     for message in LineSentence(file_generate(sentences)):
-        print(message)
         words_in_model = [word for word in message if word in vocab_dict]
-        print(words_in_model)
         word_vectors = [model.wv[word].tolist() for word in words_in_model]
-        # st_matrix = np.array(word_vectors)
-        # st_vector = np.mean(st_matrix, axis=0).tolist()
-        # st_vector = st_vector/np.linalg.norm(st_vector)
         st_vector = concat_pooling(word_vectors)
         st_vector_list.append(st_vector)
-        print()
     return np.array(st_vector_list)
 
 
@@ -150,26 +132,23 @@ def _similarity_scores(training_vectors: np.ndarray,
     # 展成list的过程就是函数表达式计算的过程，也可以用for或者next()来展开计算
 
 
+def st_st_similarity(training_sentences: tuple, test_sentence: tuple) -> list:
+    training_embeddings = _sentence_embedding(training_sentences)
+    test_embedding = _sentence_embedding(test_sentence)
+    sim_scores = _similarity_scores(training_embeddings, test_embedding)
+    return sim_scores
+
+
 # 给定一个句子和一组句子，找出后者各个句子中和前者最为相似的句子
 
-def most_similar(training_sentences: tuple, test_sentence: tuple) -> list:
-    training_embeddings = _sentence_embedding(training_sentences)
-    start = time.perf_counter()
-    test_embedding = _sentence_embedding(test_sentence)
-    print(
-        'time to get sentence vector: {:.3f}'.format(
-            time.perf_counter()-start))
-    sim_scores = _similarity_scores(training_embeddings, test_embedding)
-    print('sim_scores:')
-    formatted_sim_scores = [float('{:.3f}'.format(value))
-                            for value in sim_scores]
-    pprint.pprint(formatted_sim_scores)
+def most_similar(training_sentences: tuple, test_sentence: tuple,
+                 threshold: float) -> list:
+    sim_scores = st_st_similarity(training_sentences, test_sentence)
     sentence_score = zip(training_sentences, sim_scores)
     sentence_score = sorted(sentence_score, key=lambda x: x[1], reverse=True)
-    # sentence_score[0:5]
     sentence_score = [
         (sentence, score) for sentence, score in sentence_score
-        if score > 0.8]
+        if score > threshold]
     return sentence_score
 
 
