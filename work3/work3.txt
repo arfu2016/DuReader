@@ -9,7 +9,7 @@ python squad_mlstm/run_python3.py --train --algo BIDAF --epochs 1 --batch_size 3
 There are 32,880,003 parameters in the model
 
 Result:
-time: 1.5小时
+time: 1.5小时(32线程服务器的cpu，大概用掉20个线程)
 'Bleu-1': 0.1347
 'Bleu-4': 0.0823
 'Rouge-L': 0.338
@@ -22,7 +22,7 @@ python squad_mlstm/run_python3.py --train --algo MLSTM --epochs 1 --batch_size 3
 There are 33,647,105 parameters in the model
 
 Result:
-time: 2.5小时
+time: 2.5小时(32线程服务器的cpu，大概用掉20个线程)
 'Bleu-1': 0.149
 'Bleu-4': 0.0885
 'Rouge-L': 0.345
@@ -35,12 +35,32 @@ python decaNLP/train.py --train_tasks squad --gpus 0 --train_batch_tokens 5000 -
 There are 14,469,902 parameters in the model
 
 Result:
-time: 1小时（1个gpu）
+time: 1小时（1个gpu，GeForce GTX 1080）
 'Bleu-1': 0.525
 'Bleu-4': 0.329
 'Rouge-L': 0.493
 
-time: 3.5小时（1个gpu）
+time: 3.5小时（1个gpu，GeForce GTX 1080）
 'Bleu-1': 0.643
 'Bleu-4': 0.500
 'Rouge-L': 0.636
+
+Subset of Baidu Machine Reading Dataset (中文):
+trianing: 82909 questions
+validation: 5000 questions
+
+algorithm: BIDAF 完整模型
+epochs: 1
+batch size: 32
+No pretrained word embeddings
+python run.py --train --algo BIDAF --epochs 1 --batch_size 32 \
+--train_files '../data/preprocessed/trainset/search.train2.json' \
+--dev_files '../data/preprocessed/devset/search.dev2.json'
+
+There are 75,611,403 parameters in the model
+
+Result:
+time: 9小时(32线程服务器的cpu，大概用掉20个线程)
+'Bleu-1': 0.361
+'Bleu-4': 0.2236
+'Rouge-L': 0.2923
