@@ -9,7 +9,7 @@ python squad_mlstm/run_python3.py --train --algo BIDAF --epochs 1 --batch_size 3
 There are 32,880,003 parameters in the model
 
 Result:
-time: 1.5小时(32线程服务器的cpu，大概用掉20个线程)
+time: 1.5小时(32线程服务器的cpu，大概用掉20个线程；tensorflow的cpu版本可用多线程和多进程?)
 'Bleu-1': 0.1347
 'Bleu-4': 0.0823
 'Rouge-L': 0.338
