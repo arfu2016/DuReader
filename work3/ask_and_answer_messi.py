@@ -56,7 +56,8 @@ with open('paragraphs_messi.pkl', 'rb') as handle:
 logger.info('The context sentences for the questions:')
 pprint.pprint(asked_sentences)
 
-questions = ['梅西怎么了']*len(asked_sentences)
+questions = ['梅西做了什么']*len(asked_sentences)
+# 梅西怎么了
 
 
 def parse_args():
