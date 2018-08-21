@@ -535,7 +535,7 @@ class RCModel:
             # evaluate必然是没有dropout的
             start_probs, end_probs, loss = self.sess.run(
                 [self.start_probs, self.end_probs, self.loss], feed_dict)
-            self.logger.debug(start_probs)
+            # self.logger.debug(start_probs)
 
             total_loss += loss * len(batch['raw_data'])
             total_num += len(batch['raw_data'])
