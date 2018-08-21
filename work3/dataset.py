@@ -7,6 +7,7 @@
 """
 
 import json
+from collections import Counter
 
 import jieba
 import numpy as np
@@ -21,45 +22,29 @@ class BRCDataset:
     """
 
     def __init__(self, max_p_num, max_p_len, max_q_len,
-                 train_files=None, dev_files=None, test_files=None):
-        # p: paragraph, q: question
-        # maximal passage number for each question
-
-        if train_files is None:
-            train_files = []
-        if dev_files is None:
-            dev_files = []
-        if test_files is None:
-            test_files = []
-
+                 train_files=[], dev_files=[], test_files=[]):
+        # p: paragraph? q: question?
         self.logger = logger
-
         self.max_p_num = max_p_num
         self.max_p_len = max_p_len
         self.max_q_len = max_q_len
 
         self.train_set, self.dev_set, self.test_set = [], [], []
-
         if train_files:
             for train_file in train_files:
                 self.train_set += self._load_dataset(train_file, train=True)
                 # 准备训练数据：train_set中放的是读入的数据
-            self.logger.info(
-                'Train set size: {} questions.'.format(len(self.train_set)))
+            self.logger.info('Train set size: {} questions.'.format(len(self.train_set)))
 
         if dev_files:
             for dev_file in dev_files:
                 self.dev_set += self._load_dataset(dev_file)
-            self.logger.info(
-                'Dev set size: {} questions.'.format(len(self.dev_set)))
+            self.logger.info('Dev set size: {} questions.'.format(len(self.dev_set)))
 
         if test_files:
             for test_file in test_files:
                 self.test_set += self._load_dataset(test_file)
-            # for sample in self.test_set:
-            #     logger.debug(sample['question'])
-            self.logger.info(
-                'Test set size: {} questions.'.format(len(self.test_set)))
+            self.logger.info('Test set size: {} questions.'.format(len(self.test_set)))
 
     def _load_dataset(self, data_path, train=False):
         """
@@ -67,106 +52,69 @@ class BRCDataset:
         Args:
             data_path: the data file to load
         """
-        logger.debug(data_path)
-        data_set, all_answers = [], []
-        # 放在with模块外面，不要做成with的局部变量
         with open(data_path, encoding='utf-8') as fin:
-
-            logger.debug('Begin to load data from json file...')
-            squad = json.load(fin)['data']
-
-            # for lidx, line in enumerate(fin):
-            for document in squad:
-                # sample = json.loads(line.strip())
+            data_set = []
+            for lidx, line in enumerate(fin):
+                sample = json.loads(line.strip())
                 # 把json格式转换成python格式
-                # if train:
-                #     if len(sample['answer_spans']) == 0:
-                #         continue
-                #     # if sample['answer_spans'][0][1] >= self.max_p_len:
-                #     if sample['answer_spans'][0][1] - \
-                #             sample['answer_spans'][0][0] >= self.max_p_len:
-                #         continue
+                if train:
+                    if len(sample['answer_spans']) == 0:
+                        continue
+                    if sample['answer_spans'][0][1] >= self.max_p_len:
+                        continue
                     # 对容错的考虑
-                    # 如果没有'answer_spans'或者answer_spans太长，该行数据就被舍弃了，
+                    # 如果没有'answer_spans'，该行数据就被舍弃了，
                     # 不放在training data中
 
-                # if 'answer_docs' in sample:
-                #     sample['answer_passages'] = sample['answer_docs']
+                if 'answer_docs' in sample:
+                    sample['answer_passages'] = sample['answer_docs']
                     # 重新命名
 
-                paragraphs = document['paragraphs']
+                sample['question_tokens'] = sample['segmented_question']
+                # 重新命名
 
-                # if 'paragraphs' in document:
-                #     document['answer_passages'] = document['paragraphs']
-
-                for paragraph in paragraphs:
-
-                    context = paragraph['context']
-                    # segmented_paragraphs = context.split()
-                    segmented_paragraphs = list(jieba.cut(context))
-                    # todo_finished: revise
-                    qas = paragraph['qas']
-
-                    for qa in qas:
-                        sample = dict()
-                        # 每次把sample bound到一个新的字典上，不要去修改原来的对象
-                        # sample['question_tokens'] = sample[
-                        #     'segmented_question']
-                        sample['question_tokens'] = list(jieba.cut(
-                            qa['question']))
-                        # logger.debug(qa['question'])
-                        # todo_finished: revise
-                        question = ' '.join(sample['question_tokens'])
-                        answer = qa['answers'][0]['text']
-                        squad_id = len(all_answers)
-                        all_answers.append(
-                            [a['text'] for a in qa['answers']])
-                        answer_start = qa['answers'][0]['answer_start']
-                        answer_end = answer_start + len(answer)
-
-                        sample['passages'] = [
-                            {'passage_tokens': segmented_paragraphs,
-                             'is_selected': True}]
-                        # logger.debug(sample['passages'][0]['passage_tokens'])
-
-                        sample['question'] = question
-                        # logger.debug(sample['question'])
-                        sample['question_id'] = squad_id
-                        sample['question_type'] = "DESCRIPTION"
-                        sample['answers'] = [answer]
-                        # logger.debug(sample['answers'])
-                        sample['answer_passages'] = [0]
-
-                        word_start = len(list(jieba.cut(context[:answer_start])))
-                        word_end = word_start + len(
-                            list(jieba.cut(context[answer_start: answer_end])))
-
-                        # word_position = dict()
-                        # p_idx = 0
-                        # for idx, word in enumerate(segmented_paragraphs):
-                        #     word_position[idx] = p_idx
-                        #     p_idx += len(word)
-
-                        sample['answer_spans'] = [[word_start, word_end]]
-                        # logger.debug(sample['answer_spans'])
-                        fake_answer = sample[
-                            'passages'][0]['passage_tokens'][
-                                word_start: word_end]
-                        # fake_answer2 = context[answer_start: answer_end]
-                        sample['fake_answers'] = [' '.join(fake_answer)]
-                        # logger.debug(sample['fake_answers'])
-                        # logger.debug(fake_answer2)
-                        # todo_finished: revise
-                        sample['match_scores'] = [1.00]
-                        # sample['segmented_answers'] = answer.split()
-                        sample['segmented_answers'] = list(jieba.cut(answer))
-
-                        data_set.append(sample)
-                        # 把该行数据加入到data_set中
-
-        # for sample in data_set[-10:]:
-        #     logger.debug(sample['question'])
-
+                sample['passages'] = []
+                for d_idx, doc in enumerate(sample['documents']):
+                    # 每一篇document都做这样的处理
+                    if train:
+                        most_related_para = doc['most_related_para']
+                        # 文章中最相关的段落
+                        # The most related paragraphs are selected according to
+                        # highest recall of the answer tokens of each document,
+                        # and the index of the selected paragraph of each
+                        # document is stored in "most_related_para".
+                        # 如果没有'most_related_para'这一项如何处理，
+                        # 也应该有所设计： 从most_related_para的获取过程看，
+                        # 有answer必有'most_related_para'
+                        # 若没有answer, 就没有'answer_spans'，
+                        # 在前面已经处理过了，continue
+                        sample['passages'].append(
+                            {'passage_tokens':
+                                 doc['segmented_paragraphs'][most_related_para],
+                             # 只保留最相关段落的token
+                             'is_selected': doc['is_selected']}
+                            # 记录该篇文章是否被问题回答者参考
+                        )
+                        # 只保留了最相关的段落
+                    else:
+                        para_infos = []
+                        for para_tokens in doc['segmented_paragraphs']:
+                            question_tokens = sample['segmented_question']
+                            common_with_question = Counter(para_tokens) & Counter(question_tokens)
+                            correct_preds = sum(common_with_question.values())
+                            if correct_preds == 0:
+                                recall_wrt_question = 0
+                            else:
+                                recall_wrt_question = float(correct_preds) / len(question_tokens)
+                            para_infos.append((para_tokens, recall_wrt_question, len(para_tokens)))
+                        para_infos.sort(key=lambda x: (-x[1], x[2]))
+                        fake_passage_tokens = []
+                        for para_info in para_infos[:1]:
+                            fake_passage_tokens += para_info[0]
+                        sample['passages'].append({'passage_tokens':
+                                                       fake_passage_tokens})
+                data_set.append(sample)
+                # 把该行数据加入到data_set中
         return data_set
 
     def _one_mini_batch(self, data, indices, pad_id):
