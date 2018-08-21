@@ -299,7 +299,7 @@ def predict(args):
             for line in fin:
                 answer_dict = json.loads(line.strip())
                 question_answer.append((answer_dict['question'],
-                                        answer_dict['answers'],
+                                        answer_dict['pred_answers'],
                                         answer_dict['passages']))
         answer_samples = random.sample(question_answer, 10)
         for sample in answer_samples:
