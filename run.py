@@ -111,3 +111,5 @@ if __name__ == '__main__':
 # python run.py --train --algo BIDAF --epochs 1 --batch_size 32 \
 # --train_files '../data/preprocessed/trainset/search.train2.json' \
 # --dev_files '../data/preprocessed/devset/search.dev2.json'
+
+# python run.py --predict --algo BIDAF --batch_size 32

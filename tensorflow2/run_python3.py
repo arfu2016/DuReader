@@ -285,7 +285,8 @@ def predict(args):
                                              shuffle=False)
     rc_model.evaluate(test_batches,
                       result_dir=args.result_dir,
-                      result_prefix='test.predicted')
+                      result_prefix='test.predicted',
+                      save_full_info='True')
     # 同样使用evaluate函数
 
     result_dir = args.result_dir
@@ -298,10 +299,12 @@ def predict(args):
             for line in fin:
                 answer_dict = json.loads(line.strip())
                 question_answer.append((answer_dict['question'],
-                                        answer_dict['answers']))
+                                        answer_dict['answers'],
+                                        answer_dict['passages']))
         answer_samples = random.sample(question_answer, 10)
         for sample in answer_samples:
-            answer_string += '{}: {}\n'.format(sample[0], sample[1])
+            answer_string += '{}: {}\n{}\n\n'.format(
+                sample[0], sample[1], sample[2])
         logger.info(answer_string)
 
 
