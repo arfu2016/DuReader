@@ -211,6 +211,7 @@ def predict(args):
                                                  vocab.pad_token),
                                              context=asked_sentences,
                                              questions=questions,
+                                             vocab=vocab,
                                              shuffle=False)
     rc_model.evaluate(test_batches,
                       result_dir=args.result_dir,

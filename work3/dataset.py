@@ -262,7 +262,7 @@ class BRCDataset:
                     passage['passage_token_ids'] = \
                         vocab.convert_to_ids(passage['passage_tokens'])
 
-    def load_context(self, context, questions):
+    def load_context(self, context, questions, vocab):
         context_set = []
 
         for paragraph, question in zip(context, questions):
@@ -290,12 +290,19 @@ class BRCDataset:
 
             sample['match_scores'] = [1.00]
 
+            sample['question_token_ids'] = \
+                vocab.convert_to_ids(sample['question_tokens'])
+            # convert tokens to ids
+            for passage in sample['passages']:
+                passage['passage_token_ids'] = \
+                    vocab.convert_to_ids(passage['passage_tokens'])
+
             context_set.append(sample)
 
         return context_set
 
     def gen_mini_batches(self, set_name, batch_size, pad_id, context,
-                         questions, shuffle=True):
+                         questions, vocab, shuffle=True):
         """
         Generate data batches for a specific dataset (train/dev/test)
         Args:
@@ -304,11 +311,12 @@ class BRCDataset:
             pad_id: pad id
             context:
             questions:
+            vocab:
             shuffle: if set to be true, the data is shuffled.
         Returns:
             a generator for all batches
         """
-        context_set = self.load_context(context, questions)
+        context_set = self.load_context(context, questions, vocab)
         if set_name == 'train':
             data = self.train_set
         elif set_name == 'dev':
