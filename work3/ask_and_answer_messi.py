@@ -215,7 +215,8 @@ def predict(args):
                                              shuffle=False)
     rc_model.evaluate(test_batches,
                       result_dir=args.result_dir,
-                      result_prefix='test.predicted')
+                      result_prefix='test.predicted',
+                      save_full_info='True')
     # 同样使用evaluate函数
 
     result_dir = args.result_dir
@@ -228,13 +229,13 @@ def predict(args):
             for line in fin:
                 answer_dict = json.loads(line.strip())
                 question_answer.append((answer_dict['question'],
-                                        answer_dict['answers'],
-                                        # answer_dict['real_answer'],
+                                        answer_dict['pred_answers'],
+                                        ''.join(answer_dict['passages'][0]['passage_tokens']),
                                         ))
         answer_samples = random.sample(question_answer, 20)  # 10
         for sample in answer_samples:
-            answer_string += '{}: \nPredict: {}\n\n'.format(
-                sample[0], sample[1])
+            answer_string += '{}: \nPredict: {}\n{}\n\n'.format(
+                sample[0], sample[1], sample[2])
         logger.info(answer_string)
 
 
@@ -262,3 +263,5 @@ if __name__ == '__main__':
 
 # python work3/ask_and_answer_messi.py --predict --algo BIDAF --batch_size 32 \
 # --train_files '../data/preprocessed/trainset/search.train2.json'
+
+# python work3/ask_and_answer_messi.py --predict --algo BIDAF --batch_size 32
