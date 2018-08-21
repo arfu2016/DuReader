@@ -63,8 +63,7 @@ def parse_args():
     """
     Parses command line arguments.
     """
-    parser = argparse.ArgumentParser(
-        'Reading Comprehension on BaiduRC dataset')
+    parser = argparse.ArgumentParser('Reading Comprehension on BaiduRC dataset')
 
     parser.add_argument('--prepare', action='store_true',
                         help='create the directories, '
@@ -80,7 +79,6 @@ def parse_args():
     parser.add_argument('--predict', action='store_true',
                         help='predict the answers for test set '
                              'with trained model')
-
     parser.add_argument('--gpu', type=str, default='0',
                         help='specify gpu device')
 
@@ -101,7 +99,7 @@ def parse_args():
 
     model_settings = parser.add_argument_group('model settings')
     model_settings.add_argument('--algo', choices=['BIDAF', 'MLSTM'],
-                                default='MLSTM',
+                                default='BIDAF',
                                 help='choose the algorithm to use')
     model_settings.add_argument('--embed_size', type=int, default=300,
                                 help='size of the embeddings')
@@ -114,7 +112,7 @@ def parse_args():
     # 最多5个document备选
     model_settings.add_argument('--max_p_len', type=int, default=500,
                                 help='max length of passage')
-    # passage长度最多500？似乎看到过2500，500以后的tf计算时都不考虑
+    # passage长度最多500？似乎看到过2500
     model_settings.add_argument('--max_q_len', type=int, default=60,
                                 help='max length of question')
     # 问题长度最长60
@@ -124,36 +122,33 @@ def parse_args():
 
     path_settings = parser.add_argument_group('path settings')
 
-    path_settings.add_argument(
-        '--train_files', nargs='+',
-        default=['../data/demo/trainset/search.train.json'],
-        help='list of files that contain the preprocessed train data')
-    # nargs='+'表示--train_files之后可以有一个或者多个参数
+    path_settings.add_argument('--train_files', nargs='+',
+                               default=['../data/demo/trainset/search.train.json'],
+                               help='list of files that contain the preprocessed train data')
 
-    path_settings.add_argument(
-        '--dev_files', nargs='+',
-        default=['../data/demo/devset/search.dev.json'],
-        help='list of files that contain the preprocessed dev data')
+    path_settings.add_argument('--dev_files', nargs='+',
+                               default=['../data/demo/devset/search.dev.json'],
+                               help='list of files that contain the preprocessed dev data')
 
-    path_settings.add_argument(
-        '--test_files', nargs='+',
-        default=['../data/demo/testset/search.test.json'],
-        help='list of files that contain the preprocessed test data')
+    path_settings.add_argument('--test_files', nargs='+',
+                               default=['../data/demo/testset/search.test.json'],
+                               help='list of files that contain the preprocessed test data')
 
-    path_settings.add_argument(
-        '--brc_dir', default='../data/baidu',
-        help='the dir with preprocessed baidu reading comprehension data')
+    path_settings.add_argument('--brc_dir', default='../data/baidu',
+                               help='the dir with preprocessed baidu reading comprehension data')
 
     path_settings.add_argument('--vocab_dir', default='../data/vocab/',
                                help='the dir to save vocabulary')
+    # path_settings.add_argument('--model_dir', default='../data/models/',
+    #                            help='the dir to store models')
     path_settings.add_argument('--model_dir',
-                               default='../data/models/simple_preprocess/',
+                               default='../data/models/regular/',
                                help='the dir to store models')
     path_settings.add_argument('--result_dir',
-                               default='../data/results/simple_preprocess/',
+                               default='../data/results/regular/',
                                help='the dir to output the results')
     path_settings.add_argument('--summary_dir',
-                               default='../data/summary/simple_preprocess/',
+                               default='../data/summary/regular/',
                                help='the dir to write tensorboard summary')
     path_settings.add_argument('--log_path',
                                help='path of the log file. If not set, '
