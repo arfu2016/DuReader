@@ -14,8 +14,6 @@ import random
 import sys
 from importlib import import_module
 
-from work4.logger_setup import define_logger
-
 base_dir = os.path.dirname(
     os.path.dirname(
         os.path.abspath(__file__)
@@ -25,6 +23,7 @@ base_dir = os.path.dirname(
 
 try:
 
+    from work4.logger_setup import define_logger
     from work3.dataset import BRCDataset
     from tensorflow2.vocab import Vocab
     from tensorflow2.rc_model import RCModel
@@ -35,6 +34,7 @@ except ImportError:
         sys.path.insert(0, base_dir)
         # 以base_dir为基准开始导入
 
+    from work4.logger_setup import define_logger
     module_dataset = import_module('.dataset', package='work3')
     module_vocab = import_module('.vocab', package='tensorflow2')
     module_rc_model = import_module('.rc_model', package='tensorflow2')
@@ -264,5 +264,5 @@ def run():
 if __name__ == '__main__':
     run()
 
-# python work3/ask_and_answer.py --predict --algo BIDAF --batch_size 32 \
+# python work3/ask_and_answer_messi.py --predict --algo BIDAF --batch_size 32 \
 # --train_files '../data/preprocessed/trainset/search.train2.json'
