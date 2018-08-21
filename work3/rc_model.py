@@ -52,7 +52,7 @@ class RCModel:
     def __init__(self, vocab, args):
 
         # logging
-        logger = logging.getLogger("tensorflow2.rc_model")
+        logger = logging.getLogger("work3.rc_model")
         logger.setLevel(logging.DEBUG)
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s')
@@ -535,6 +535,7 @@ class RCModel:
             # evaluate必然是没有dropout的
             start_probs, end_probs, loss = self.sess.run(
                 [self.start_probs, self.end_probs, self.loss], feed_dict)
+            self.logger.debug(start_probs)
 
             total_loss += loss * len(batch['raw_data'])
             total_num += len(batch['raw_data'])
