@@ -26,7 +26,7 @@ try:
     from work4.logger_setup import define_logger
     from work3.dataset import BRCDataset
     from tensorflow2.vocab import Vocab
-    from tensorflow2.rc_model import RCModel
+    from work3.rc_model import RCModel
 
 except ImportError:
 
@@ -37,7 +37,7 @@ except ImportError:
     from work4.logger_setup import define_logger
     module_dataset = import_module('.dataset', package='work3')
     module_vocab = import_module('.vocab', package='tensorflow2')
-    module_rc_model = import_module('.rc_model', package='tensorflow2')
+    module_rc_model = import_module('.rc_model', package='work3')
 
     BRCDataset = getattr(module_dataset, 'BRCDataset')
     Vocab = getattr(module_vocab, 'Vocab')
