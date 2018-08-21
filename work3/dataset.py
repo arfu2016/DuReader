@@ -281,8 +281,9 @@ class BRCDataset:
             sample['passages'] = [
                 {'passage_tokens': segmented_paragraphs,
                  'is_selected': True},
-                {'passage_tokens': ['梅西', '啥', '都', '没', '做'],
+                {'passage_tokens': ['梅西', '技术', '好'],
                  # ['梅西', '迷失', '了']
+                 # 梅西 啥 都 没 做
                  'is_selected': True}
             ]
             # logger.debug(sample['passages'][0]['passage_tokens'])
