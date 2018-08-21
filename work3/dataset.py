@@ -10,7 +10,6 @@ import json
 
 import jieba
 import numpy as np
-from nltk.tokenize import word_tokenize
 from work4.logger_setup import define_logger
 logger = define_logger('work3.dataset')
 
@@ -104,7 +103,7 @@ class BRCDataset:
 
                     context = paragraph['context']
                     # segmented_paragraphs = context.split()
-                    segmented_paragraphs = word_tokenize(context)
+                    segmented_paragraphs = list(jieba.cut(context))
                     # todo_finished: revise
                     qas = paragraph['qas']
 
@@ -113,8 +112,8 @@ class BRCDataset:
                         # 每次把sample bound到一个新的字典上，不要去修改原来的对象
                         # sample['question_tokens'] = sample[
                         #     'segmented_question']
-                        sample['question_tokens'] = word_tokenize(
-                            qa['question'])
+                        sample['question_tokens'] = list(jieba.cut(
+                            qa['question']))
                         # logger.debug(qa['question'])
                         # todo_finished: revise
                         question = ' '.join(sample['question_tokens'])
@@ -138,9 +137,9 @@ class BRCDataset:
                         # logger.debug(sample['answers'])
                         sample['answer_passages'] = [0]
 
-                        word_start = len(word_tokenize(context[:answer_start]))
+                        word_start = len(list(jieba.cut(context[:answer_start])))
                         word_end = word_start + len(
-                            word_tokenize(context[answer_start: answer_end]))
+                            list(jieba.cut(context[answer_start: answer_end])))
 
                         # word_position = dict()
                         # p_idx = 0
@@ -160,7 +159,7 @@ class BRCDataset:
                         # todo_finished: revise
                         sample['match_scores'] = [1.00]
                         # sample['segmented_answers'] = answer.split()
-                        sample['segmented_answers'] = word_tokenize(answer)
+                        sample['segmented_answers'] = list(jieba.cut(answer))
 
                         data_set.append(sample)
                         # 把该行数据加入到data_set中
