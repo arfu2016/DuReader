@@ -34,17 +34,20 @@ class BRCDataset:
             for train_file in train_files:
                 self.train_set += self._load_dataset(train_file, train=True)
                 # 准备训练数据：train_set中放的是读入的数据
-            self.logger.info('Train set size: {} questions.'.format(len(self.train_set)))
+            self.logger.info(
+                'Train set size: {} questions.'.format(len(self.train_set)))
 
         if dev_files:
             for dev_file in dev_files:
                 self.dev_set += self._load_dataset(dev_file)
-            self.logger.info('Dev set size: {} questions.'.format(len(self.dev_set)))
+            self.logger.info(
+                'Dev set size: {} questions.'.format(len(self.dev_set)))
 
         if test_files:
             for test_file in test_files:
                 self.test_set += self._load_dataset(test_file)
-            self.logger.info('Test set size: {} questions.'.format(len(self.test_set)))
+            self.logger.info(
+                'Test set size: {} questions.'.format(len(self.test_set)))
 
     def _load_dataset(self, data_path, train=False):
         """
@@ -100,19 +103,23 @@ class BRCDataset:
                         para_infos = []
                         for para_tokens in doc['segmented_paragraphs']:
                             question_tokens = sample['segmented_question']
-                            common_with_question = Counter(para_tokens) & Counter(question_tokens)
+                            common_with_question = Counter(
+                                para_tokens) & Counter(question_tokens)
                             correct_preds = sum(common_with_question.values())
                             if correct_preds == 0:
                                 recall_wrt_question = 0
                             else:
-                                recall_wrt_question = float(correct_preds) / len(question_tokens)
-                            para_infos.append((para_tokens, recall_wrt_question, len(para_tokens)))
+                                recall_wrt_question = float(
+                                    correct_preds) / len(question_tokens)
+                            para_infos.append(
+                                (para_tokens, recall_wrt_question,
+                                 len(para_tokens)))
                         para_infos.sort(key=lambda x: (-x[1], x[2]))
                         fake_passage_tokens = []
                         for para_info in para_infos[:1]:
                             fake_passage_tokens += para_info[0]
                         sample['passages'].append({'passage_tokens':
-                                                       fake_passage_tokens})
+                                                   fake_passage_tokens})
                 data_set.append(sample)
                 # 把该行数据加入到data_set中
         return data_set

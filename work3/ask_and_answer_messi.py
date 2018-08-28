@@ -64,7 +64,7 @@ def parse_args():
     """
     Parses command line arguments.
     """
-    parser = argparse.ArgumentParser('Reading Comprehension on BaiduRC dataset')
+    parser = argparse.ArgumentParser('Machine Reading Comprehension')
 
     parser.add_argument('--prepare', action='store_true',
                         help='create the directories, '
@@ -123,20 +123,25 @@ def parse_args():
 
     path_settings = parser.add_argument_group('path settings')
 
-    path_settings.add_argument('--train_files', nargs='+',
-                               default=['../data/demo/trainset/search.train.json'],
-                               help='list of files that contain the preprocessed train data')
+    path_settings.add_argument(
+        '--train_files', nargs='+',
+        default=['../data/demo/trainset/search.train.json'],
+        help='list of files that contain the preprocessed train data')
+    # nargs='+'表示--train_files之后可以有一个或者多个参数
 
-    path_settings.add_argument('--dev_files', nargs='+',
-                               default=['../data/demo/devset/search.dev.json'],
-                               help='list of files that contain the preprocessed dev data')
+    path_settings.add_argument(
+        '--dev_files', nargs='+',
+        default=['../data/demo/devset/search.dev.json'],
+        help='list of files that contain the preprocessed dev data')
 
-    path_settings.add_argument('--test_files', nargs='+',
-                               default=['../data/demo/testset/search.test.json'],
-                               help='list of files that contain the preprocessed test data')
+    path_settings.add_argument(
+        '--test_files', nargs='+',
+        default=['../data/demo/testset/search.test.json'],
+        help='list of files that contain the preprocessed test data')
 
-    path_settings.add_argument('--brc_dir', default='../data/baidu',
-                               help='the dir with preprocessed baidu reading comprehension data')
+    path_settings.add_argument(
+        '--brc_dir', default='../data/baidu',
+        help='the dir with preprocessed baidu reading comprehension data')
 
     path_settings.add_argument('--vocab_dir', default='../data/vocab/',
                                help='the dir to save vocabulary')
