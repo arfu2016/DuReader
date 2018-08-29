@@ -70,3 +70,8 @@ time: 18小时(32线程服务器的cpu，大概用掉20个线程)
 'Bleu-1': 0.381
 'Bleu-4': 0.2393
 'Rouge-L': 0.3025
+
+python work3/ask_and_answer_messi.py --predict --algo BIDAF --batch_size 32
+给出一组context，从中选出最适合回答某个问题的context中的一段内容
+给出一组context，在其中掺入另外的一句回答，给定某个问题，选出这一组context当中比新掺入
+的这句更合适的回答，回答是context当中的一部分内容
