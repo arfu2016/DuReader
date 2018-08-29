@@ -148,7 +148,7 @@ def most_similar(training_sentences: tuple, test_sentence: tuple,
     sentence_score = sorted(sentence_score, key=lambda x: x[1], reverse=True)
     sentence_score = [
         (sentence, score) for sentence, score in sentence_score
-        if score > threshold]
+        if score >= threshold]
     return sentence_score
 
 

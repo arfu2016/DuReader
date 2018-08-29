@@ -181,7 +181,7 @@ def search_data_match():
                         "query": {"bool": {
                          "must": {"match": {"title": "梅西"}},
                         }},
-                        "size": 41
+                        "size": 42
                         })
     # pprint.pprint(p)
 
