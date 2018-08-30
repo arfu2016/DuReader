@@ -16,6 +16,12 @@ python extract_person.py
 python similar_info.py
 
 爬虫：scrapy
-实体抽取：elastic search
+实体抽取：elastic search，模板规则，正则规则，词性规则，句法规则
 事件抽取：sentence embedding
+
+聚类用于改进事件抽取策略：看看抽取出时间的句子的聚类在整个句子聚类中的分布，
+特别是用pca降到2维后画图来看，
+看大片的没有被抽取事件的句子到底是在描述什么，反过来改进需要抽取的事件
+
+自然语言数据挖掘的工具化
 """
