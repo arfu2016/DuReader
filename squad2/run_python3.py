@@ -344,3 +344,6 @@ def run():
 
 if __name__ == '__main__':
     run()
+
+# python squad2/run_python3.py --prepare
+# python squad2/run_python3.py --train --algo BIDAF --epochs 1 --batch_size 32

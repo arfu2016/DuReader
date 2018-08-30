@@ -1,6 +1,32 @@
 squad 1.1 training dataset: 87599 questions
 squad 1.1 validation dataset: 10570 questions
 
+algorithm: BIDAF 简化模型
+epochs: 1
+batch size: 32
+No pretrained word embeddings
+python squad2/run_python3.py --train --algo BIDAF --epochs 1 --batch_size 32
+There are 30,176,403 parameters in the model
+
+Result:
+time: 0.5小时(32线程服务器的cpu，大概用掉20个线程；tensorflow的cpu版本可用多线程和多进程?)
+'Bleu-1': 0.089
+'Bleu-4': 0.045
+'Rouge-L': 0.1585
+
+algorithm: MLSTM 简化模型
+epochs: 1
+batch size: 32
+No pretrained word embeddings
+python squad2/run_python3.py --train --algo MLSTM --epochs 1 --batch_size 32
+There are 32,023,505 parameters in the model
+
+Result:
+time: 1.5小时(32线程服务器的cpu，大概用掉20个线程；tensorflow的cpu版本可用多线程和多进程?)
+'Bleu-1': 0.0887
+'Bleu-4': 0.0554
+'Rouge-L': 0.2736
+
 algorithm: BIDAF 完整模型
 epochs: 1
 batch size: 32
