@@ -171,4 +171,5 @@ def del_megacorp():
 
 
 if __name__ == '__main__':
-    list_indices()
+    # list_indices()
+    view_mapping()

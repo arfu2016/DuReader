@@ -23,7 +23,7 @@ es = elasticsearch.Elasticsearch([{'host': 'localhost', 'port': 9200}])
 def set_logger():
     # for logging
 
-    log_path = 'logs/dongqiudi.txt'  # ''
+    log_path = 'logs/dongqiudi.txt'  # ''，表示当前目录
 
     program = os.path.basename(sys.argv[0])
     logger = logging.getLogger(program)
@@ -116,6 +116,7 @@ def construct_query(list_data_dict):
         search_arr.append({"query": {"bool": {"filter": {"bool": {"must": [
                       {"term": {"title.keyword": data_dict['title'][0]}},
                   ]}}}}})
+        # filter要放在bool下面，must也要放在bool下面，term要放在must下面
 
     request = ''
     for each in search_arr:
@@ -181,6 +182,7 @@ def search_data_match():
                         "query": {"bool": {
                          "must": {"match": {"title": "梅西"}},
                         }},
+                        # must放在bool下面，match放在must下面
                         "size": 33
                         })
     pprint.pprint(p)
@@ -194,6 +196,9 @@ def search_data_term():
                          "must": {"term": {
                              "title.keyword": "海外版图再扩张，中超将在美国巴西直播"}},
                         }}}},
+                        # 用view_mapping()来看，可以看到title下面的fields有keyword，type
+                        # 也叫keyword, 意思是not analysed，没有分词等处理；title的type
+                        # 是text，也就是经过analysed，可以用于match的
                         "size": 10
                   })
     pprint.pprint(p)
@@ -207,6 +212,8 @@ def search_data_date():
                             "range": {"display_time": {
                                 "gte": '2018-06-20 00:00:00',
                                 }},
+                            # range必须放在filter下面
+                            # constant_score意味着只做筛选，不做搜索结果的排名
                             }}}})
     pprint.pprint(p)
 
@@ -221,6 +228,8 @@ def search_data_date2():
                                     "format": "YYYY-MM-DD"
                                     # "format": "yyyy-MM-dd"
                                     }}
+                            # 数据库中保存的是年月日、时间
+                            # 筛选时只用年月日，是这样做的
                             }}}})
     pprint.pprint(p)
 
@@ -301,6 +310,7 @@ def word_cloud():
                                 }
                             },
                          })
+    # 不再是query，而是做aggregation
     pprint.pprint(p['aggregations'])
 
 
@@ -324,6 +334,7 @@ def word_cloud2():
                             }
                         },
                     })
+    # 先做query，再做aggregation，构成串联的pipeline
     pprint.pprint(p['aggregations'])
 
 

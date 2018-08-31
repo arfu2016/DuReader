@@ -16,7 +16,7 @@ python extract_person.py
 python similar_info.py
 
 爬虫：scrapy
-实体抽取：elastic search，模板规则，正则规则，词性规则，句法规则
+实体抽取：elastic search；模板规则，正则规则，词性规则，句法规则；word window classification
 事件抽取：sentence embedding
 
 聚类用于改进事件抽取策略：看看抽取出时间的句子的聚类在整个句子聚类中的分布，
