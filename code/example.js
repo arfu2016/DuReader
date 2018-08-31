@@ -3,7 +3,8 @@ const puppeteer = require('puppeteer');
 (async () => {
   const browser = await puppeteer.launch({
         executablePath: '/home/app/chrome-linux/chrome',
-        headless: false
+        headless: false,
+        args: ['--no-sandbox']
       }
   );
   const page = await browser.newPage();
