@@ -3,9 +3,10 @@ const puppeteer = require('puppeteer');
 (async () => {
 // 异步函数
   const browser = await puppeteer.launch({
-        executablePath: '/home/app/chrome-linux/chrome',
-        headless: true,
-        args: ['--no-sandbox']
+        executablePath: '/usr/bin/google-chrome-stable',
+        // google-chrome
+        headless: false,
+        // args: ['--no-sandbox']
       }
   );
   const page = await browser.newPage();
