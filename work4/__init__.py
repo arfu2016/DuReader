@@ -3,12 +3,14 @@
 @Module    : __init__.py.py
 @Author    : Deco [deco@cubee.com]
 @Created   : 8/14/18 5:06 PM
-@Desc      :
+@Desc      : The core is person and related stories, data and analysis
+以产品为核心，机器人
 1. cd scrapy2/dongqiudi
 python data_preprocessing/clear_items.py
 python data_preprocessing/show_items.py
 scrapy crawl manual -o items.json
 python data_preprocessing/show_items.py
+
 2. cd elasticsearch2
 python add_dongqiudi.py
 python extract_person.py

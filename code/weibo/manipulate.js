@@ -9,10 +9,16 @@ const puppeteer = require('puppeteer');
         // args: ['--no-sandbox']
       }
   );
+  const user_agent = await browser.userAgent()
+  console.log('user_agent:', user_agent)
+
   const page = await browser.newPage();
   // 异步的执行
-  await page.goto('https://example.com');
-  await page.screenshot({path: 'example.png'});
+  await page.goto('https://www.weibo.com', {waitUntil: 'networkidle0'});
+  // networkidle2
+  // https://example.com
+  await page.waitForNavigation({waitUntil: 'load'})
+  await page.screenshot({path: 'weibo.png'});
 
   await browser.close();
 })();
